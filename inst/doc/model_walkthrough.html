@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>model_walkthrough</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">model_walkthrough</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(funkycells)</span></code></pre></div>
+<p>This vignettes walks through the approach <code>funkycells</code>
+takes to modeling data. The package <code>funkycells</code> is best
+employed when considering spatial data. While this data is typically
+collected, below such data is created.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>cell_data <span class="ot">&lt;-</span> <span class="fu">simulatePP</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">agentVarData =</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>      <span class="st">&quot;outcome&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>      <span class="st">&quot;A&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>      <span class="st">&quot;B&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">100</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">300</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>    ),</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="at">agentKappaData =</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>      <span class="st">&quot;agent&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>),</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>      <span class="st">&quot;clusterAgent&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="st">&quot;A&quot;</span>),</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>      <span class="st">&quot;kappa&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">5</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>    ),</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>  <span class="at">unitsPerOutcome =</span> <span class="dv">15</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>  <span class="at">replicatesPerUnit =</span> <span class="dv">2</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>  <span class="at">silent =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>)</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; Outcome: 0 (1/2)</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; Outcome: 1 (2/2)</span></span></code></pre></div>
+<p>The created data has two outcomes (<span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>), and two cells (<span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span>). The cells are constructed such that
+<span class="math inline">\(A\)</span> is completely spatial random and
+<span class="math inline">\(B\)</span> clusters around <span class="math inline">\(A\)</span>. Moreover, <span class="math inline">\(B\)</span> has increased clustering in stage <span class="math inline">\(1\)</span> when compared to stage <span class="math inline">\(0\)</span>. The data has <span class="math inline">\(15\)</span> patients in each stage, with <span class="math inline">\(2\)</span> images per patient. An example image
+for each stage is given below.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">plotPP</span>(cell_data[cell_data<span class="sc">$</span>replicate <span class="sc">==</span> <span class="dv">1</span>, <span class="fu">c</span>(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>, <span class="st">&quot;type&quot;</span>)],</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="at">ptSize =</span> <span class="dv">2</span>, <span class="at">colorGuide =</span> ggplot2<span class="sc">::</span><span class="fu">guide_legend</span>(<span class="at">title =</span> <span class="st">&quot;Cells&quot;</span>),</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">plotPP</span>(cell_data[cell_data<span class="sc">$</span>replicate <span class="sc">==</span> <span class="dv">21</span>, <span class="fu">c</span>(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>, <span class="st">&quot;type&quot;</span>)],</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">ptSize =</span> <span class="dv">2</span>, <span class="at">colorGuide =</span> ggplot2<span class="sc">::</span><span class="fu">guide_legend</span>(<span class="at">title =</span> <span class="st">&quot;Cells&quot;</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>The next step is to summarize the functions. This is done through
+<span class="math inline">\(2\)</span>-way interactions using <span class="math inline">\(K\)</span> functions. With only two cells, there
+are four possible interactions (<span class="math inline">\(A\)</span>-<span class="math inline">\(A\)</span>,<span class="math inline">\(A\)</span>-<span class="math inline">\(B\)</span>,
+<span class="math inline">\(B\)</span>-<span class="math inline">\(A\)</span>, and <span class="math inline">\(B\)</span>-<span class="math inline">\(B\)</span>). Often reverse interactions
+(i.e. <span class="math inline">\(A\)</span>-<span class="math inline">\(B\)</span> and <span class="math inline">\(B\)</span>-<span class="math inline">\(A\)</span>)
+are highly related and so consideration of only one is encouraged to
+remove variables in the model and improve power. An example of the <span class="math inline">\(K\)</span> functions is given below.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>AB_ex <span class="ot">&lt;-</span> <span class="fu">getKFunction</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  cell_data[</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>    cell_data<span class="sc">$</span>replicate <span class="sc">==</span> <span class="dv">1</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>    <span class="sc">!</span>(<span class="fu">colnames</span>(cell_data) <span class="sc">%in%</span> (<span class="st">&quot;outcome&quot;</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  ],</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="at">agents =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>), <span class="at">unit =</span> <span class="st">&quot;unit&quot;</span>, <span class="at">replicate =</span> <span class="st">&quot;replicate&quot;</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="at">rCheckVals =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.01</span>), <span class="at">xRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">yRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_line</span>(ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> r, <span class="at">y =</span> K1), <span class="at">data =</span> AB_ex, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme</span>(</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>    <span class="at">axis.title =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>    <span class="at">axis.text =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>()</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>  )</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>These functions must then be projected into finite dimensions. Since
+<span class="math inline">\(K\)</span> functions are so commonly used,
+<code>funkycells</code> has a specialized function for computing and
+projecting the <span class="math inline">\(K\)</span> functions through
+the popular functional principle components analysis. The following code
+projects the functions into <span class="math inline">\(3\)</span>
+principle components each.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>pcaData <span class="ot">&lt;-</span> <span class="fu">getKsPCAData</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="at">data =</span> cell_data, <span class="at">replicate =</span> <span class="st">&quot;replicate&quot;</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="at">agents_df =</span> <span class="fu">data.frame</span>(<span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>), <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;B&quot;</span>)),</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="at">xRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">yRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>  <span class="at">nPCs =</span> <span class="dv">3</span>, <span class="at">silent =</span> T</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>)</span></code></pre></div>
+<p>Often data is also collected with some meta-variables, such as with
+patient age or sex Both age and sex are simulated below. In the
+simulation, higher age is related to outcome <span class="math inline">\(1\)</span> while sex has no effect.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>pcaMeta <span class="ot">&lt;-</span> <span class="fu">simulateMeta</span>(pcaData,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">metaInfo =</span> <span class="fu">data.frame</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>    <span class="st">&quot;var&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;sex&quot;</span>, <span class="st">&quot;age&quot;</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>    <span class="st">&quot;rdist&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;rbinom&quot;</span>, <span class="st">&quot;rnorm&quot;</span>),</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>    <span class="st">&quot;outcome_0&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;0.5&quot;</span>, <span class="st">&quot;25&quot;</span>),</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>    <span class="st">&quot;outcome_1&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;0.5&quot;</span>, <span class="st">&quot;26&quot;</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  )</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>)</span></code></pre></div>
+<p>This data is fed into <code>funkyModel()</code> which adds synthetics
+and examines the variables efficacy in predicting the outcome.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>model_fm <span class="ot">&lt;-</span> <span class="fu">funkyModel</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">data =</span> pcaMeta,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">&quot;outcome&quot;</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="at">unit =</span> <span class="st">&quot;unit&quot;</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="at">metaNames =</span> <span class="fu">c</span>(<span class="st">&quot;sex&quot;</span>, <span class="st">&quot;age&quot;</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>)</span></code></pre></div>
+<p>The model returns, in addition to other details, a variable
+importance plot. This plot can be used to compare efficacy of each
+variable in comparison to each other and random noise.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>model_fm<span class="sc">$</span>viPlot</span></code></pre></div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

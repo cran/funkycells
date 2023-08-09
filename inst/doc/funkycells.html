@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>funkycells</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">funkycells</h1>
+
+
+
+<div id="overview" class="section level1">
+<h1>Overview</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(funkycells)</span></code></pre></div>
+<p>This documents a sample view of <code>funkycells</code>. Every
+function will be examined throughout this vignette, feel free to see the
+process from beginning to end or jumping to a given step in the
+document. Although each step in the <code>funkycells</code> process is
+addressed, detailed information on each function is left to their
+respective documentation.</p>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>This package is interested in investigating spatial data. Although
+potentially combined, in the most raw form the data of interest would be
+(1) agent, or cell, information (locations, patient, image, etc.) and
+(2) meta-data (patient demographics, etc.).</p>
+<p>Rather than loading in data, we will generate data with such
+properties. The cell data is constructed using
+<code>simulatePP()</code>, as given below.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>cell_data <span class="ot">&lt;-</span> <span class="fu">simulatePP</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">agentVarData =</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>      <span class="st">&quot;outcome&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>      <span class="st">&quot;A&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>      <span class="st">&quot;B&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">100</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">500</span>),</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>      <span class="st">&quot;C&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">500</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">250</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>      <span class="st">&quot;D&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">100</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">100</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>    ),</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  <span class="at">agentKappaData =</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>      <span class="st">&quot;agent&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>),</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>      <span class="st">&quot;clusterAgent&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="st">&quot;A&quot;</span>, <span class="cn">NA</span>, <span class="cn">NA</span>),</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>      <span class="st">&quot;kappa&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">5</span>, <span class="dv">15</span>, <span class="dv">15</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>    ),</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>  <span class="at">unitsPerOutcome =</span> <span class="dv">40</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>  <span class="at">replicatesPerUnit =</span> <span class="dv">1</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>  <span class="at">silent =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>)</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; Outcome: 0 (1/2)</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; Outcome: 1 (2/2)</span></span></code></pre></div>
+<p>We look at some pictures using <code>plotPP()</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">plotPP</span>(cell_data[cell_data<span class="sc">$</span>replicate <span class="sc">==</span> <span class="dv">1</span>, <span class="fu">c</span>(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>, <span class="st">&quot;type&quot;</span>)],</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="at">dropAxes =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">colorGuide =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>In funkycells we often explain the cell interactions using <span class="math inline">\(K\)</span> functions, although many functions are
+feasible. For example, K functions could be computed as the following
+function.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>k_data <span class="ot">&lt;-</span> <span class="fu">getKFunction</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">data =</span> cell_data[cell_data<span class="sc">$</span>unit <span class="sc">==</span> <span class="st">&quot;u1&quot;</span>, <span class="sc">-</span><span class="dv">1</span>],</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">agents =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;A&quot;</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">unit =</span> <span class="st">&quot;unit&quot;</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="at">replicate =</span> <span class="st">&quot;replicate&quot;</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="at">rCheckVals =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.01</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="at">xRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  <span class="at">yRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>)</span></code></pre></div>
+<p>However, <code>funkyModel()</code> does not use functions directly,
+but the principle components of functions. Because of the commonness of
+<span class="math inline">\(K\)</span> functions, currently we
+implemented the steps in the same function. Although in our data, the
+types are in a single column, the functions accepts when the cell
+properties are defined in many columns (see documentation on
+<code>getKsPCAData()</code>). We also note that we only consider
+one-direction of the interactions to reduce variables and improve model
+power.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>cells <span class="ot">&lt;-</span> <span class="fu">unique</span>(cell_data<span class="sc">$</span>type)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>cells_interactions <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="fu">t</span>(<span class="fu">combn</span>(cells, <span class="dv">2</span>))),</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="st">&quot;X1&quot;</span> <span class="ot">=</span> cells, <span class="st">&quot;X2&quot;</span> <span class="ot">=</span> cells)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>pca_data <span class="ot">&lt;-</span> <span class="fu">getKsPCAData</span>(</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  <span class="at">data =</span> cell_data,</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">&quot;outcome&quot;</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  <span class="at">unit =</span> <span class="st">&quot;unit&quot;</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>  <span class="at">replicate =</span> <span class="st">&quot;replicate&quot;</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>  <span class="at">rCheckVals =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.01</span>),</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>  <span class="at">agents_df =</span> cells_interactions,</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>  <span class="at">xRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">yRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>  <span class="at">nPCs =</span> <span class="dv">3</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>)</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; PCA Pairs (10): 1, 2, 3, 4, 5, 6, 7, 8, 9, 10</span></span></code></pre></div>
+<p>Upon this data, we attach the meta information. For example, to this
+data we will add gender (with no effect), and age (with some
+effect).</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>pcaMeta <span class="ot">&lt;-</span> <span class="fu">simulateMeta</span>(pca_data,</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">&quot;outcome&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="at">metaInfo =</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    <span class="st">&quot;var&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;gender&quot;</span>, <span class="st">&quot;age&quot;</span>),</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>    <span class="st">&quot;rdist&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;rbinom&quot;</span>, <span class="st">&quot;rnorm&quot;</span>),</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>    <span class="st">&quot;outcome_0&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;0.5&quot;</span>, <span class="st">&quot;30&quot;</span>),</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>    <span class="st">&quot;outcome_1&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;0.5&quot;</span>, <span class="st">&quot;31&quot;</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  )</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="model" class="section level1">
+<h1>Model</h1>
+<p>We now jump into the model. We use <code>funkyModel()</code> as it
+employs cross-validation and permutation to create accurate models.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>model_fc <span class="ot">&lt;-</span> <span class="fu">funkyModel</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">data =</span> pcaMeta,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">&quot;outcome&quot;</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">unit =</span> <span class="st">&quot;unit&quot;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="at">metaNames =</span> <span class="fu">c</span>(<span class="st">&quot;gender&quot;</span>, <span class="st">&quot;age&quot;</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>)</span></code></pre></div>
+<p>The variable importance plot is returned (plot not shown as this was
+not run for computational reasons).</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>model_fc<span class="sc">$</span>viPlot</span></code></pre></div>
+<p>The results of the model from <code>funkyModel()</code> also includes
+the model from <code>funkyForest()</code> on the original data, which is
+necessary when trying to predict new data. Suppose we create a few new
+people (i.e. get more data) and wish to predict. This would be done as
+follows.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12345</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>cell_data_pred <span class="ot">&lt;-</span> <span class="fu">simulatePP</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="at">agentVarData =</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>      <span class="st">&quot;outcome&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>      <span class="st">&quot;A&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>      <span class="st">&quot;B&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">100</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">500</span>),</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>      <span class="st">&quot;C&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">500</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">250</span>),</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>      <span class="st">&quot;D&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">100</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">100</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>    ),</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>  <span class="at">agentKappaData =</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>      <span class="st">&quot;agent&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>),</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>      <span class="st">&quot;clusterAgent&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="st">&quot;A&quot;</span>, <span class="cn">NA</span>, <span class="cn">NA</span>),</span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>      <span class="st">&quot;kappa&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">5</span>, <span class="dv">15</span>, <span class="dv">15</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>    ),</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>  <span class="at">unitsPerOutcome =</span> <span class="dv">2</span>,</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>  <span class="at">replicatesPerUnit =</span> <span class="dv">2</span>,</span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>  <span class="at">silent =</span> <span class="cn">FALSE</span></span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a>)</span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a>pca_data_pred <span class="ot">&lt;-</span> <span class="fu">getKsPCAData</span>(</span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a>  <span class="at">data =</span> cell_data_pred,</span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">&quot;outcome&quot;</span>,</span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a>  <span class="at">unit =</span> <span class="st">&quot;unit&quot;</span>,</span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a>  <span class="at">replicate =</span> <span class="st">&quot;replicate&quot;</span>,</span>
+<span id="cb9-27"><a href="#cb9-27" tabindex="-1"></a>  <span class="at">rCheckVals =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.01</span>),</span>
+<span id="cb9-28"><a href="#cb9-28" tabindex="-1"></a>  <span class="at">agents_df =</span> cells_interactions,</span>
+<span id="cb9-29"><a href="#cb9-29" tabindex="-1"></a>  <span class="at">xRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">yRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb9-30"><a href="#cb9-30" tabindex="-1"></a>  <span class="at">nPCs =</span> <span class="dv">3</span></span>
+<span id="cb9-31"><a href="#cb9-31" tabindex="-1"></a>)</span>
+<span id="cb9-32"><a href="#cb9-32" tabindex="-1"></a></span>
+<span id="cb9-33"><a href="#cb9-33" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12345</span>)</span>
+<span id="cb9-34"><a href="#cb9-34" tabindex="-1"></a>pcaMeta_pred <span class="ot">&lt;-</span> <span class="fu">simulateMeta</span>(pca_data_pred,</span>
+<span id="cb9-35"><a href="#cb9-35" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">&quot;outcome&quot;</span>,</span>
+<span id="cb9-36"><a href="#cb9-36" tabindex="-1"></a>  <span class="at">metaInfo =</span> <span class="fu">data.frame</span>(</span>
+<span id="cb9-37"><a href="#cb9-37" tabindex="-1"></a>    <span class="st">&quot;var&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;gender&quot;</span>, <span class="st">&quot;age&quot;</span>),</span>
+<span id="cb9-38"><a href="#cb9-38" tabindex="-1"></a>    <span class="st">&quot;rdist&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;rbinom&quot;</span>, <span class="st">&quot;rnorm&quot;</span>),</span>
+<span id="cb9-39"><a href="#cb9-39" tabindex="-1"></a>    <span class="st">&quot;outcome_0&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;0.5&quot;</span>, <span class="st">&quot;30&quot;</span>),</span>
+<span id="cb9-40"><a href="#cb9-40" tabindex="-1"></a>    <span class="st">&quot;outcome_1&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;0.5&quot;</span>, <span class="st">&quot;31&quot;</span>)</span>
+<span id="cb9-41"><a href="#cb9-41" tabindex="-1"></a>  )</span>
+<span id="cb9-42"><a href="#cb9-42" tabindex="-1"></a>)</span>
+<span id="cb9-43"><a href="#cb9-43" tabindex="-1"></a></span>
+<span id="cb9-44"><a href="#cb9-44" tabindex="-1"></a>predictions <span class="ot">&lt;-</span> <span class="fu">predict_funkyForest</span>(<span class="at">model =</span> model_fc<span class="sc">$</span>model, <span class="at">data_pred =</span> pcaMeta_pred[<span class="sc">-</span><span class="dv">1</span>])</span></code></pre></div>
+</div>
+<div id="other-investigations" class="section level1">
+<h1>Other Investigations</h1>
+<p>We also can compare K functions by group.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>ab_outcome0 <span class="ot">&lt;-</span> <span class="fu">getKFunction</span>(cell_data[cell_data<span class="sc">$</span>outcome <span class="sc">==</span> <span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>],</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="at">agents =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>), <span class="at">unit =</span> <span class="st">&quot;unit&quot;</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">replicate =</span> <span class="st">&quot;replicate&quot;</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="at">rCheckVals =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.01</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>)</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>ab_outcome1 <span class="ot">&lt;-</span> <span class="fu">getKFunction</span>(cell_data[cell_data<span class="sc">$</span>outcome <span class="sc">==</span> <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>],</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>  <span class="at">agents =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>), <span class="at">unit =</span> <span class="st">&quot;unit&quot;</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  <span class="at">replicate =</span> <span class="st">&quot;replicate&quot;</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>  <span class="at">rCheckVals =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.01</span>)</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>)</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>ab_outcome0_long <span class="ot">&lt;-</span> tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(<span class="at">data =</span> ab_outcome0, <span class="at">cols =</span> K1<span class="sc">:</span>K15)</span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>ab_outcome1_long <span class="ot">&lt;-</span> tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(<span class="at">data =</span> ab_outcome1, <span class="at">cols =</span> K1<span class="sc">:</span>K15)</span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>data_k_plot <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>    <span class="st">&quot;r&quot;</span> <span class="ot">=</span> ab_outcome0_long<span class="sc">$</span>r,</span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a>    <span class="st">&quot;K&quot;</span> <span class="ot">=</span> ab_outcome0_long<span class="sc">$</span>value,</span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a>    <span class="st">&quot;unit&quot;</span> <span class="ot">=</span> ab_outcome0_long<span class="sc">$</span>name,</span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a>    <span class="st">&quot;outcome&quot;</span> <span class="ot">=</span> <span class="st">&quot;0&quot;</span></span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a>  ),</span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a>    <span class="st">&quot;r&quot;</span> <span class="ot">=</span> ab_outcome1_long<span class="sc">$</span>r,</span>
+<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a>    <span class="st">&quot;K&quot;</span> <span class="ot">=</span> ab_outcome1_long<span class="sc">$</span>value,</span>
+<span id="cb10-25"><a href="#cb10-25" tabindex="-1"></a>    <span class="st">&quot;unit&quot;</span> <span class="ot">=</span> <span class="fu">paste0</span>(ab_outcome1_long<span class="sc">$</span>name, <span class="st">&quot;_1&quot;</span>),</span>
+<span id="cb10-26"><a href="#cb10-26" tabindex="-1"></a>    <span class="st">&quot;outcome&quot;</span> <span class="ot">=</span> <span class="st">&quot;1&quot;</span></span>
+<span id="cb10-27"><a href="#cb10-27" tabindex="-1"></a>  )</span>
+<span id="cb10-28"><a href="#cb10-28" tabindex="-1"></a>)</span>
+<span id="cb10-29"><a href="#cb10-29" tabindex="-1"></a></span>
+<span id="cb10-30"><a href="#cb10-30" tabindex="-1"></a><span class="fu">plot_K_functions</span>(data_k_plot)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>We can also consider ROC curves (Figure may not be shown due to
+computational reasons).</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>pred_roc <span class="ot">&lt;-</span> <span class="fu">predict_funkyForest</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="at">model =</span> model_fc<span class="sc">$</span>model,</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="at">data_pred =</span> pcaMeta[<span class="sc">-</span><span class="dv">2</span>],</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="at">data =</span> pcaMeta[<span class="sc">-</span><span class="dv">2</span>]</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>)</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="fu">computePseudoROCCurves</span>(pcaMeta<span class="sc">$</span>outcome, pred_roc<span class="sc">$</span>PredPerc[<span class="sc">-</span><span class="dv">1</span>])</span></code></pre></div>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>There are many uses for funkycells, but we hope this gives a taste of
+the current functionality and aids in understanding of the documentation
+provided.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

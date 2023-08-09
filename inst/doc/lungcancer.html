@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>lungcancer</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">lungcancer</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(funkycells)</span></code></pre></div>
+<p>This vignette gives the code used to analyze the lung cancer data.
+However, due to data privacy, that data is not yet available in package.
+This is being investigated and we hope future version of the package
+include this data.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>dat <span class="ot">&lt;-</span> lungcancer</span></code></pre></div>
+<p>This data is pre-processed and thus we only need to complete a few
+steps. But to aid in these, we define a few functions.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>getInteractions <span class="ot">&lt;-</span> <span class="cf">function</span>(cells,</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>                            <span class="at">dropCells =</span> <span class="fu">c</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>                              <span class="st">&quot;Epithelialcells&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>                              <span class="st">&quot;Stromalcells&quot;</span>, <span class="st">&quot;Other&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>                            )) {</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  cells <span class="ot">&lt;-</span> cells[<span class="sc">!</span>(cells <span class="sc">%in%</span> dropCells)]</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  return_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">&quot;c1&quot;</span> <span class="ot">=</span> cells[<span class="dv">1</span>], <span class="st">&quot;c2&quot;</span> <span class="ot">=</span> cells[<span class="dv">1</span>])</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(cells) <span class="sc">&gt;</span> <span class="dv">1</span>) {</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>    return_df <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>      <span class="fu">data.frame</span>(<span class="fu">t</span>(<span class="fu">combn</span>(cells, <span class="dv">2</span>))),</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>      <span class="fu">data.frame</span>(<span class="st">&quot;X1&quot;</span> <span class="ot">=</span> cells, <span class="st">&quot;X2&quot;</span> <span class="ot">=</span> cells)</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>    )</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>  }</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>  return_df</span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>}</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>clean_figures <span class="ot">&lt;-</span> <span class="cf">function</span>(model_rf) {</span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>  specify_decimal <span class="ot">&lt;-</span> .specify_decimal</span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>  <span class="co"># Get Vars</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>  viData <span class="ot">&lt;-</span> model_rf<span class="sc">$</span>VariableImportance</span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>  accData <span class="ot">&lt;-</span> model_rf<span class="sc">$</span>AccuracyEstimate</span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>  NoiseCutoff <span class="ot">&lt;-</span> model_rf<span class="sc">$</span>NoiseCutoff</span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>  InterpolationCutoff <span class="ot">&lt;-</span> model_rf<span class="sc">$</span>InterpolationCutoff</span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>  subsetPlotSize <span class="ot">&lt;-</span> model_rf<span class="sc">$</span>AdditionalParams<span class="sc">$</span>subsetPlotSize</span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>  <span class="co"># Plot Full</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a>  maxVal <span class="ot">&lt;-</span> <span class="fu">max</span>(InterpolationCutoff, NoiseCutoff, viData<span class="sc">$</span>est)</span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a>  plot_full <span class="ot">&lt;-</span> ggplot2<span class="sc">::</span><span class="fu">ggplot</span>(</span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a>    <span class="at">data =</span> viData,</span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a>    <span class="at">mapping =</span> ggplot2<span class="sc">::</span><span class="fu">aes</span>(</span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a>      <span class="at">x =</span> <span class="fu">factor</span>(stats<span class="sc">::</span><span class="fu">reorder</span>(var, est)),</span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a>      <span class="at">y =</span> <span class="fu">ifelse</span>(est <span class="sc">/</span> maxVal <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="dv">1</span>,</span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a>        <span class="fu">ifelse</span>(est <span class="sc">/</span> maxVal <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="dv">0</span>,</span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a>          est <span class="sc">/</span> maxVal</span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a>        )</span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a>      ),</span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a>      <span class="at">group =</span> <span class="dv">1</span></span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a>    )</span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">geom_errorbar</span>(</span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a>      ggplot2<span class="sc">::</span><span class="fu">aes</span>(</span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a>        <span class="at">ymin =</span> <span class="fu">ifelse</span>((est <span class="sc">-</span> sd) <span class="sc">/</span> maxVal <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="dv">0</span>, (est <span class="sc">-</span> sd) <span class="sc">/</span> maxVal),</span>
+<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a>        <span class="at">ymax =</span> <span class="fu">ifelse</span>((est <span class="sc">+</span> sd) <span class="sc">/</span> maxVal <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="dv">1</span>, (est <span class="sc">+</span> sd) <span class="sc">/</span> maxVal)</span>
+<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a>      ),</span>
+<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">width =</span> <span class="fl">0.2</span></span>
+<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">geom_hline</span>(</span>
+<span id="cb3-50"><a href="#cb3-50" tabindex="-1"></a>      ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">yintercept =</span> <span class="fu">max</span>(<span class="dv">0</span>, <span class="fu">min</span>(<span class="dv">1</span>, NoiseCutoff <span class="sc">/</span> maxVal))),</span>
+<span id="cb3-51"><a href="#cb3-51" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">linetype =</span> <span class="st">&quot;dotted&quot;</span>, <span class="at">linewidth =</span> <span class="dv">2</span></span>
+<span id="cb3-52"><a href="#cb3-52" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb3-53"><a href="#cb3-53" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">coord_flip</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb3-54"><a href="#cb3-54" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">xlab</span>(<span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb3-55"><a href="#cb3-55" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">ylim</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb3-56"><a href="#cb3-56" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">ylab</span>(<span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb3-57"><a href="#cb3-57" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb3-58"><a href="#cb3-58" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">theme</span>(</span>
+<span id="cb3-59"><a href="#cb3-59" tabindex="-1"></a>      <span class="at">axis.text =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">18</span>),</span>
+<span id="cb3-60"><a href="#cb3-60" tabindex="-1"></a>      <span class="at">axis.text.y =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
+<span id="cb3-61"><a href="#cb3-61" tabindex="-1"></a>      <span class="at">axis.ticks.y =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
+<span id="cb3-62"><a href="#cb3-62" tabindex="-1"></a>      <span class="at">panel.grid.major.y =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
+<span id="cb3-63"><a href="#cb3-63" tabindex="-1"></a>      <span class="at">axis.title =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">20</span>)</span>
+<span id="cb3-64"><a href="#cb3-64" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb3-65"><a href="#cb3-65" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">geom_line</span>(ggplot2<span class="sc">::</span><span class="fu">aes</span>(</span>
+<span id="cb3-66"><a href="#cb3-66" tabindex="-1"></a>      <span class="at">x =</span> <span class="fu">ordered</span>(viData[<span class="fu">order</span>(<span class="sc">-</span>est), <span class="st">&quot;var&quot;</span>]),</span>
+<span id="cb3-67"><a href="#cb3-67" tabindex="-1"></a>      <span class="at">y =</span> InterpolationCutoff <span class="sc">/</span> maxVal</span>
+<span id="cb3-68"><a href="#cb3-68" tabindex="-1"></a>    ), <span class="at">color =</span> <span class="st">&quot;orange&quot;</span>, <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb3-69"><a href="#cb3-69" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">ylab</span>(<span class="fu">paste0</span>(</span>
+<span id="cb3-70"><a href="#cb3-70" tabindex="-1"></a>      <span class="st">&quot;OOB (&quot;</span>,</span>
+<span id="cb3-71"><a href="#cb3-71" tabindex="-1"></a>      <span class="fu">specify_decimal</span>(accData<span class="sc">$</span>OOB, <span class="dv">2</span>),</span>
+<span id="cb3-72"><a href="#cb3-72" tabindex="-1"></a>      <span class="st">&quot;), Guess (&quot;</span>,</span>
+<span id="cb3-73"><a href="#cb3-73" tabindex="-1"></a>      <span class="fu">specify_decimal</span>(accData<span class="sc">$</span>guess, <span class="dv">2</span>),</span>
+<span id="cb3-74"><a href="#cb3-74" tabindex="-1"></a>      <span class="st">&quot;), Bias (&quot;</span>,</span>
+<span id="cb3-75"><a href="#cb3-75" tabindex="-1"></a>      <span class="fu">specify_decimal</span>(accData<span class="sc">$</span>bias, <span class="dv">2</span>), <span class="st">&quot;)&quot;</span></span>
+<span id="cb3-76"><a href="#cb3-76" tabindex="-1"></a>    ))</span>
+<span id="cb3-77"><a href="#cb3-77" tabindex="-1"></a></span>
+<span id="cb3-78"><a href="#cb3-78" tabindex="-1"></a>  <span class="co"># Plot Subset</span></span>
+<span id="cb3-79"><a href="#cb3-79" tabindex="-1"></a>  InterpolationCutoff1 <span class="ot">&lt;-</span> InterpolationCutoff[<span class="dv">1</span><span class="sc">:</span>subsetPlotSize]</span>
+<span id="cb3-80"><a href="#cb3-80" tabindex="-1"></a>  viData1 <span class="ot">&lt;-</span> viData[<span class="fu">order</span>(<span class="sc">-</span>viData<span class="sc">$</span>est), ]</span>
+<span id="cb3-81"><a href="#cb3-81" tabindex="-1"></a>  viData1 <span class="ot">&lt;-</span> viData1[<span class="dv">1</span><span class="sc">:</span>subsetPlotSize, ]</span>
+<span id="cb3-82"><a href="#cb3-82" tabindex="-1"></a></span>
+<span id="cb3-83"><a href="#cb3-83" tabindex="-1"></a>  maxVal <span class="ot">&lt;-</span> <span class="fu">max</span>(InterpolationCutoff1, NoiseCutoff, viData1<span class="sc">$</span>est)</span>
+<span id="cb3-84"><a href="#cb3-84" tabindex="-1"></a>  plot_top25 <span class="ot">&lt;-</span> ggplot2<span class="sc">::</span><span class="fu">ggplot</span>(</span>
+<span id="cb3-85"><a href="#cb3-85" tabindex="-1"></a>    <span class="at">data =</span> viData1,</span>
+<span id="cb3-86"><a href="#cb3-86" tabindex="-1"></a>    <span class="at">mapping =</span> ggplot2<span class="sc">::</span><span class="fu">aes</span>(</span>
+<span id="cb3-87"><a href="#cb3-87" tabindex="-1"></a>      <span class="at">x =</span> <span class="fu">factor</span>(stats<span class="sc">::</span><span class="fu">reorder</span>(var, est)),</span>
+<span id="cb3-88"><a href="#cb3-88" tabindex="-1"></a>      <span class="at">y =</span> <span class="fu">ifelse</span>(est <span class="sc">/</span> maxVal <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="dv">1</span>,</span>
+<span id="cb3-89"><a href="#cb3-89" tabindex="-1"></a>        <span class="fu">ifelse</span>(est <span class="sc">/</span> maxVal <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="dv">0</span>,</span>
+<span id="cb3-90"><a href="#cb3-90" tabindex="-1"></a>          est <span class="sc">/</span> maxVal</span>
+<span id="cb3-91"><a href="#cb3-91" tabindex="-1"></a>        )</span>
+<span id="cb3-92"><a href="#cb3-92" tabindex="-1"></a>      ),</span>
+<span id="cb3-93"><a href="#cb3-93" tabindex="-1"></a>      <span class="at">group =</span> <span class="dv">1</span></span>
+<span id="cb3-94"><a href="#cb3-94" tabindex="-1"></a>    )</span>
+<span id="cb3-95"><a href="#cb3-95" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb3-96"><a href="#cb3-96" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">geom_errorbar</span>(</span>
+<span id="cb3-97"><a href="#cb3-97" tabindex="-1"></a>      ggplot2<span class="sc">::</span><span class="fu">aes</span>(</span>
+<span id="cb3-98"><a href="#cb3-98" tabindex="-1"></a>        <span class="at">ymin =</span> <span class="fu">ifelse</span>((est <span class="sc">-</span> sd) <span class="sc">/</span> maxVal <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="dv">0</span>, (est <span class="sc">-</span> sd) <span class="sc">/</span> maxVal),</span>
+<span id="cb3-99"><a href="#cb3-99" tabindex="-1"></a>        <span class="at">ymax =</span> <span class="fu">ifelse</span>((est <span class="sc">+</span> sd) <span class="sc">/</span> maxVal <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="dv">1</span>, (est <span class="sc">+</span> sd) <span class="sc">/</span> maxVal)</span>
+<span id="cb3-100"><a href="#cb3-100" tabindex="-1"></a>      ),</span>
+<span id="cb3-101"><a href="#cb3-101" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">width =</span> <span class="fl">0.2</span></span>
+<span id="cb3-102"><a href="#cb3-102" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb3-103"><a href="#cb3-103" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb3-104"><a href="#cb3-104" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">geom_hline</span>(</span>
+<span id="cb3-105"><a href="#cb3-105" tabindex="-1"></a>      ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">yintercept =</span> <span class="fu">max</span>(<span class="dv">0</span>, <span class="fu">min</span>(<span class="dv">1</span>, NoiseCutoff <span class="sc">/</span> maxVal))),</span>
+<span id="cb3-106"><a href="#cb3-106" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">linetype =</span> <span class="st">&quot;dotted&quot;</span>, <span class="at">linewidth =</span> <span class="dv">2</span></span>
+<span id="cb3-107"><a href="#cb3-107" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb3-108"><a href="#cb3-108" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">coord_flip</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb3-109"><a href="#cb3-109" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">xlab</span>(<span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb3-110"><a href="#cb3-110" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">ylim</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb3-111"><a href="#cb3-111" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">ylab</span>(<span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb3-112"><a href="#cb3-112" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb3-113"><a href="#cb3-113" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">theme</span>(</span>
+<span id="cb3-114"><a href="#cb3-114" tabindex="-1"></a>      <span class="at">axis.text.x =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">17</span>),</span>
+<span id="cb3-115"><a href="#cb3-115" tabindex="-1"></a>      <span class="at">axis.text.y =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>),</span>
+<span id="cb3-116"><a href="#cb3-116" tabindex="-1"></a>      <span class="at">axis.ticks.y =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
+<span id="cb3-117"><a href="#cb3-117" tabindex="-1"></a>      <span class="at">panel.grid.major.y =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
+<span id="cb3-118"><a href="#cb3-118" tabindex="-1"></a>      <span class="at">axis.title =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">17</span>)</span>
+<span id="cb3-119"><a href="#cb3-119" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb3-120"><a href="#cb3-120" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">geom_line</span>(ggplot2<span class="sc">::</span><span class="fu">aes</span>(</span>
+<span id="cb3-121"><a href="#cb3-121" tabindex="-1"></a>      <span class="at">x =</span> <span class="fu">ordered</span>(viData1[<span class="fu">order</span>(<span class="sc">-</span>est), <span class="st">&quot;var&quot;</span>]),</span>
+<span id="cb3-122"><a href="#cb3-122" tabindex="-1"></a>      <span class="at">y =</span> InterpolationCutoff1 <span class="sc">/</span> maxVal</span>
+<span id="cb3-123"><a href="#cb3-123" tabindex="-1"></a>    ), <span class="at">color =</span> <span class="st">&quot;orange&quot;</span>, <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb3-124"><a href="#cb3-124" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">ylab</span>(<span class="fu">paste0</span>(</span>
+<span id="cb3-125"><a href="#cb3-125" tabindex="-1"></a>      <span class="st">&quot;OOB (&quot;</span>,</span>
+<span id="cb3-126"><a href="#cb3-126" tabindex="-1"></a>      <span class="fu">specify_decimal</span>(accData<span class="sc">$</span>OOB, <span class="dv">2</span>),</span>
+<span id="cb3-127"><a href="#cb3-127" tabindex="-1"></a>      <span class="st">&quot;), Guess (&quot;</span>,</span>
+<span id="cb3-128"><a href="#cb3-128" tabindex="-1"></a>      <span class="fu">specify_decimal</span>(accData<span class="sc">$</span>guess, <span class="dv">2</span>),</span>
+<span id="cb3-129"><a href="#cb3-129" tabindex="-1"></a>      <span class="st">&quot;), Bias (&quot;</span>,</span>
+<span id="cb3-130"><a href="#cb3-130" tabindex="-1"></a>      <span class="fu">specify_decimal</span>(accData<span class="sc">$</span>bias, <span class="dv">2</span>), <span class="st">&quot;)&quot;</span></span>
+<span id="cb3-131"><a href="#cb3-131" tabindex="-1"></a>    ))</span>
+<span id="cb3-132"><a href="#cb3-132" tabindex="-1"></a></span>
+<span id="cb3-133"><a href="#cb3-133" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb3-134"><a href="#cb3-134" tabindex="-1"></a>    <span class="st">&quot;full&quot;</span> <span class="ot">=</span> plot_full,</span>
+<span id="cb3-135"><a href="#cb3-135" tabindex="-1"></a>    <span class="st">&quot;top&quot;</span> <span class="ot">=</span> plot_top25</span>
+<span id="cb3-136"><a href="#cb3-136" tabindex="-1"></a>  )</span>
+<span id="cb3-137"><a href="#cb3-137" tabindex="-1"></a>}</span></code></pre></div>
+<p>The data must be converted to <span class="math inline">\(K\)</span>
+functions, then to in finite dimensions. This data is then combined with
+the smoking meta-data.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>pcaData <span class="ot">&lt;-</span> <span class="fu">getKsPCAData</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">data =</span> use_data[<span class="sc">!</span>(<span class="fu">colnames</span>(use_data) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;SmokingStatusLong&quot;</span>))],</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">&quot;Cancer&quot;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">unit =</span> <span class="st">&quot;Patient&quot;</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="at">replicate =</span> <span class="st">&quot;Image&quot;</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="at">rCheckVals =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">50</span>, <span class="dv">1</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="at">nPCs =</span> <span class="dv">3</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  <span class="at">agents_df =</span> ints,</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  <span class="at">displayTVE =</span> <span class="cn">FALSE</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>)</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>data_rf <span class="ot">&lt;-</span> <span class="fu">merge</span>(pcaData,</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  <span class="fu">unique</span>(use_data[, <span class="fu">c</span>(<span class="st">&quot;Patient&quot;</span>, <span class="st">&quot;SmokingStatusLong&quot;</span>)]),</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  <span class="at">keep.x =</span> <span class="cn">TRUE</span>, <span class="at">by.x =</span> <span class="st">&quot;Patient&quot;</span>, <span class="at">by.y =</span> <span class="st">&quot;Patient&quot;</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>)</span></code></pre></div>
+<p>And then we fit the model on the data:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12345</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>model_fm <span class="ot">&lt;-</span> <span class="fu">funkyModel</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">data =</span> data_rf[<span class="sc">!</span><span class="fu">is.na</span>(data_rf[[<span class="st">&quot;Cancer&quot;</span>]]), ],</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">&quot;Cancer&quot;</span>, <span class="at">unit =</span> <span class="st">&quot;Patient&quot;</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="at">metaNames =</span> <span class="st">&quot;SmokingStatusLong&quot;</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>)</span></code></pre></div>
+<p>The plots can be given as well:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>figs <span class="ot">&lt;-</span> <span class="fu">clean_figures</span>(model_fm)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>figs<span class="sc">$</span>full</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>fits<span class="sc">$</span>top</span></code></pre></div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

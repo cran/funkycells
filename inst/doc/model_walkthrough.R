@@ -1,0 +1,279 @@
+## ---- include = FALSE---------------------------------------------------------
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+## ----setup--------------------------------------------------------------------
+library(funkycells)
+
+## ----define_functions, echo=FALSE---------------------------------------------
+full_run <- FALSE # This runs only computations that are feasibly quick
+paper_run <- FALSE # This creates and saves figures as in paper
+save_path <- tempdir() # Save to temp directory as desired
+
+## ----build_data---------------------------------------------------------------
+set.seed(123)
+cell_data <- simulatePP(
+  agentVarData =
+    data.frame(
+      "outcome" = c(0, 1),
+      "A" = c(0, 0),
+      "B" = c(1 / 100, 1 / 300)
+    ),
+  agentKappaData =
+    data.frame(
+      "agent" = c("A", "B"),
+      "clusterAgent" = c(NA, "A"),
+      "kappa" = c(20, 5)
+    ),
+  unitsPerOutcome = 15,
+  replicatesPerUnit = 2,
+  silent = FALSE
+)
+
+## ----show_spatial_images------------------------------------------------------
+plotPP(cell_data[cell_data$replicate == 1, c("x", "y", "type")],
+  ptSize = 2, colorGuide = ggplot2::guide_legend(title = "Cells"),
+  xlim = c(0, 1), ylim = c(0, 1)
+)
+
+plotPP(cell_data[cell_data$replicate == 21, c("x", "y", "type")],
+  ptSize = 2, colorGuide = ggplot2::guide_legend(title = "Cells"),
+  xlim = c(0, 1), ylim = c(0, 1)
+)
+
+## ----paper_spatial_images, echo=FALSE, eval=paper_run-------------------------
+#  img1 <- plotPP(
+#    data = cell_data[cell_data$replicate == 1, c("x", "y", "type")],
+#    ptSize = 3, dropAxes = T, colorGuide = "none"
+#  )
+#  png(paste0(save_path,"/paper/diagram_pp1.png"), width = 800, height = 800)
+#  print(img1)
+#  dev.off()
+#  
+#  img21 <- plotPP(
+#    data = cell_data[cell_data$replicate == 21, c("x", "y", "type")],
+#    ptSize = 3, dropAxes = T, colorGuide = "none"
+#  )
+#  png(paste0(save_path,"/paper/diagram_pp21.png"), width = 800, height = 800)
+#  print(img21)
+#  dev.off()
+#  
+#  img41 <- plotPP(
+#    data = cell_data[cell_data$replicate == 41, c("x", "y", "type")],
+#    ptSize = 3, dropAxes = T, colorGuide = "none"
+#  )
+#  png(paste0(save_path,"/paper/diagram_pp41.png"), width = 800, height = 800)
+#  print(img41)
+#  dev.off()
+
+## ----show_K_functions---------------------------------------------------------
+AB_ex <- getKFunction(
+  cell_data[
+    cell_data$replicate == 1,
+    !(colnames(cell_data) %in% ("outcome"))
+  ],
+  agents = c("A", "B"), unit = "unit", replicate = "replicate",
+  rCheckVals = seq(0, 0.25, 0.01), xRange = c(0, 1), yRange = c(0, 1)
+)
+
+ggplot2::ggplot() +
+  ggplot2::geom_line(ggplot2::aes(x = r, y = K1), data = AB_ex, linewidth = 2) +
+  ggplot2::theme_bw() +
+  ggplot2::theme(
+    axis.title = ggplot2::element_blank(),
+    axis.text = ggplot2::element_blank()
+  )
+
+## ----paper_K_functions, echo=FALSE, eval=paper_run----------------------------
+#  AA_im1 <- getKFunction(
+#    cell_data[
+#      cell_data$replicate == 1,
+#      !(colnames(cell_data) %in% ("outcome"))
+#    ],
+#    agents = c("A", "A"), unit = "unit", replicate = "replicate",
+#    rCheckVals = seq(0, 0.25, 0.01), xRange = c(0, 1), yRange = c(0, 1)
+#  )
+#  AB_im1 <- getKFunction(
+#    cell_data[
+#      cell_data$replicate == 1,
+#      !(colnames(cell_data) %in% ("outcome"))
+#    ],
+#    agents = c("A", "B"), unit = "unit", replicate = "replicate",
+#    rCheckVals = seq(0, 0.25, 0.01), xRange = c(0, 1), yRange = c(0, 1)
+#  )
+#  
+#  AAfig_im1 <- ggplot2::ggplot() +
+#    ggplot2::geom_line(ggplot2::aes(x = r, y = K1), data = AA_im1, linewidth = 3) +
+#    ggplot2::theme_bw() +
+#    ggplot2::theme(
+#      axis.title = ggplot2::element_blank(),
+#      axis.text = ggplot2::element_blank()
+#    )
+#  png(paste0(save_path,"/paper/diagram_K_AA_i1.png"), width = 800, height = 800)
+#  print(AAfig_im1)
+#  dev.off()
+#  
+#  ABfig_im1 <- ggplot2::ggplot() +
+#    ggplot2::geom_line(ggplot2::aes(x = r, y = K1), data = AB_im1, linewidth = 3) +
+#    ggplot2::theme_bw() +
+#    ggplot2::theme(
+#      axis.title = ggplot2::element_blank(),
+#      axis.text = ggplot2::element_blank()
+#    )
+#  png(paste0(save_path,"/paper/diagram_K_AB_i1.png"), width = 800, height = 800)
+#  print(ABfig_im1)
+#  dev.off()
+
+## ----pca----------------------------------------------------------------------
+pcaData <- getKsPCAData(
+  data = cell_data, replicate = "replicate",
+  agents_df = data.frame(c("A", "A", "B"), c("A", "B", "B")),
+  xRange = c(0, 1), yRange = c(0, 1),
+  nPCs = 3, silent = T
+)
+
+## ----simulate_meta------------------------------------------------------------
+set.seed(123)
+pcaMeta <- simulateMeta(pcaData,
+  metaInfo = data.frame(
+    "var" = c("sex", "age"),
+    "rdist" = c("rbinom", "rnorm"),
+    "outcome_0" = c("0.5", "25"),
+    "outcome_1" = c("0.5", "26")
+  )
+)
+
+## ----evaluate_model, eval=full_run | full_run---------------------------------
+#  set.seed(123)
+#  model_fm <- funkyModel(
+#    data = pcaMeta,
+#    outcome = "outcome",
+#    unit = "unit",
+#    metaNames = c("sex", "age")
+#  )
+
+## ----show_variable_importance, eval=full_run----------------------------------
+#  model_fm$viPlot
+
+## ----paper_variable_importance, echo=FALSE, eval=paper_run--------------------
+#  # Get Vars
+#  viData <- model_fm$VariableImportance
+#  accData <- model_fm$AccuracyEstimate
+#  NoiseCutoff <- model_fm$NoiseCutoff
+#  InterpolationCutoff <- model_fm$InterpolationCutoff
+#  
+#  # Plot
+#  maxVal <- max(InterpolationCutoff, NoiseCutoff, viData$est)
+#  plot_vi_full <- ggplot2::ggplot(
+#    data = viData,
+#    mapping = ggplot2::aes(
+#      x = factor(stats::reorder(var, est)),
+#      y = ifelse(est / maxVal > 1, 1,
+#        ifelse(est / maxVal < 0, 0,
+#          est / maxVal
+#        )
+#      ),
+#      group = 1
+#    )
+#  ) +
+#    ggplot2::geom_errorbar(
+#      ggplot2::aes(
+#        ymin = ifelse((est - sd) / maxVal < 0, 0, (est - sd) / maxVal),
+#        ymax = ifelse((est + sd) / maxVal > 1, 1, (est + sd) / maxVal)
+#      ),
+#      color = "black", width = 0.2
+#    ) +
+#    ggplot2::geom_point(color = "black", size = 3) +
+#    ggplot2::geom_hline(
+#      ggplot2::aes(yintercept = max(0, min(1, NoiseCutoff / maxVal))),
+#      color = "red", linetype = "dotted", linewidth = 2
+#    ) +
+#    ggplot2::coord_flip(ylim = c(0, 1)) +
+#    ggplot2::xlab(NULL) +
+#    ggplot2::ylim(c(0, 1)) +
+#    ggplot2::ylab(NULL) +
+#    ggplot2::theme_bw() +
+#    ggplot2::theme(
+#      axis.text = ggplot2::element_text(size = 18),
+#      axis.text.x = ggplot2::element_blank(),
+#      axis.text.y = ggplot2::element_blank(),
+#      axis.ticks.y = ggplot2::element_blank(),
+#      panel.grid.major.y = ggplot2::element_blank(),
+#      axis.title = ggplot2::element_text(size = 20)
+#    ) +
+#    ggplot2::geom_line(ggplot2::aes(
+#      x = ordered(viData[order(-est), "var"]),
+#      y = InterpolationCutoff / maxVal
+#    ), color = "orange", linetype = "dashed", linewidth = 2) +
+#    ggplot2::ylab(paste0(
+#      "OOB (",
+#      specify_decimal(accData$OOB, 2),
+#      "), Guess (",
+#      specify_decimal(accData$guess, 2),
+#      "), Bias (",
+#      specify_decimal(accData$bias, 2), ")"
+#    ))
+#  
+#  png(paste0(save_path,"/paper/diagram_variableimportance.png"))
+#  print(plot_vi_full)
+#  dev.off()
+#  
+#  
+#  # Plot
+#  maxVal <- max(InterpolationCutoff, NoiseCutoff, viData$est)
+#  plot_vi_details <- ggplot2::ggplot(
+#    data = viData,
+#    mapping = ggplot2::aes(
+#      x = factor(stats::reorder(var, est)),
+#      y = ifelse(est / maxVal > 1, 1,
+#        ifelse(est / maxVal < 0, 0,
+#          est / maxVal
+#        )
+#      ),
+#      group = 1
+#    )
+#  ) +
+#    ggplot2::geom_errorbar(
+#      ggplot2::aes(
+#        ymin = ifelse((est - sd) / maxVal < 0, 0, (est - sd) / maxVal),
+#        ymax = ifelse((est + sd) / maxVal > 1, 1, (est + sd) / maxVal)
+#      ),
+#      color = "black", width = 0.2
+#    ) +
+#    ggplot2::geom_point(color = "black", size = 3) +
+#    ggplot2::geom_hline(
+#      ggplot2::aes(yintercept = max(0, min(1, NoiseCutoff / maxVal))),
+#      color = "red", linetype = "dotted", linewidth = 2
+#    ) +
+#    ggplot2::coord_flip(ylim = c(0, 1)) +
+#    ggplot2::xlab(NULL) +
+#    ggplot2::ylim(c(0, 1)) +
+#    ggplot2::ylab(NULL) +
+#    ggplot2::theme_bw() +
+#    ggplot2::theme(
+#      axis.text = ggplot2::element_text(size = 18),
+#      axis.text.x = ggplot2::element_blank(),
+#      # axis.text.y = ggplot2::element_blank(),
+#      axis.ticks.y = ggplot2::element_blank(),
+#      panel.grid.major.y = ggplot2::element_blank(),
+#      axis.title = ggplot2::element_text(size = 20)
+#    ) +
+#    ggplot2::geom_line(ggplot2::aes(
+#      x = ordered(viData[order(-est), "var"]),
+#      y = InterpolationCutoff / maxVal
+#    ), color = "orange", linetype = "dashed", linewidth = 2) +
+#    ggplot2::ylab(paste0(
+#      "OOB (",
+#      specify_decimal(accData$OOB, 2),
+#      "), Guess (",
+#      specify_decimal(accData$guess, 2),
+#      "), Bias (",
+#      specify_decimal(accData$bias, 2), ")"
+#    ))
+#  
+#  png(paste0(save_path,"/paper/diagram_variableimportance_names.png"))
+#  print(plot_vi_details)
+#  dev.off()
+

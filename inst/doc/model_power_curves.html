@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>model_power_curves</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">model_power_curves</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(funkycells)</span></code></pre></div>
+<p>This vignette shows the power curve for the model. This curves are
+based on data similar to that in the triple negative breast cancer data,
+for which there is another vignette <code>vignette(&quot;TNBC&quot;)</code>. To
+this end, we consider two cases: (1) a few number of interactions and
+(2) a large number of interactions.</p>
+<p>In both cases, we consider the <span class="math inline">\(c1\_c2\)</span> interaction of varying strength
+and trend between two outcomes. In the null case, there is some
+clustering of <span class="math inline">\(c2\)</span> around <span class="math inline">\(c1\)</span> in both cases (the placing normal
+distribution using a standard deviation of 1/40). There are 5 cases on
+either side of this value, i.e. increased clustering or repulsion.
+Additional variables are generated: an additional <span class="math inline">\(2\)</span> cells in small and <span class="math inline">\(14\)</span> cells in the large cases are added,
+and meta-variable age is included.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>nSims <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>changes <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="dv">40</span> <span class="sc">*</span> <span class="fu">c</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">2</span>, <span class="fl">1.5</span>, <span class="fl">1.25</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="dv">1</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="dv">1</span> <span class="sc">/</span> <span class="fl">1.25</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="fl">1.5</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">2</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">3</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">4</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>baseline <span class="ot">&lt;-</span> changes[<span class="dv">6</span>]</span></code></pre></div>
+<p>For the small number of interactions scenario, we consider <span class="math inline">\(4\)</span> cells and interactions between
+them.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>cells <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;c&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>cells_interactions <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="fu">t</span>(<span class="fu">combn</span>(cells, <span class="dv">2</span>))),</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="st">&quot;X1&quot;</span> <span class="ot">=</span> cells, <span class="st">&quot;X2&quot;</span> <span class="ot">=</span> cells)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>)</span></code></pre></div>
+<p>Next the data is generated, <span class="math inline">\(100\)</span>
+data sets for each scenario (as given below).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>info <span class="ot">&lt;-</span> rfdata <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="cf">for</span> (c <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(changes)) {</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">- Change: &quot;</span>, changes[c], <span class="st">&quot;</span><span class="sc">\n</span><span class="st">-- (&quot;</span>, nSims, <span class="st">&quot;): &quot;</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="fu">set.seed</span>(c <span class="sc">*</span> <span class="dv">123</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nSims) {</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">paste0</span>(i, <span class="st">&quot;, &quot;</span>))</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>    <span class="co"># Generate</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>    dat <span class="ot">&lt;-</span> <span class="fu">simulatePP</span>(</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>      <span class="at">agentVarData =</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>        <span class="fu">data.frame</span>(</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>          <span class="st">&quot;outcome&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>          <span class="st">&quot;c1&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>          <span class="st">&quot;c2&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(baseline, changes[c])<span class="sc">^</span><span class="dv">2</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>          <span class="st">&quot;c3&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">50</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">50</span>),</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>          <span class="st">&quot;c4&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">10</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">10</span>)</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>        ),</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>      <span class="at">agentKappaData =</span> <span class="fu">data.frame</span>(</span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>        <span class="st">&quot;agent&quot;</span> <span class="ot">=</span> <span class="fu">paste0</span>(<span class="st">&quot;c&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>),</span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>        <span class="st">&quot;clusterAgent&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="st">&quot;c1&quot;</span>, <span class="st">&quot;c1&quot;</span>, <span class="cn">NA</span>),</span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>        <span class="st">&quot;kappa&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>          <span class="dv">30</span>,</span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>          <span class="dv">5</span>, <span class="dv">5</span>,</span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>          <span class="dv">30</span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a>        )</span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a>      ),</span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a>      <span class="at">unitsPerOutcome =</span> <span class="dv">17</span>,</span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a>      <span class="at">replicatesPerUnit =</span> <span class="dv">1</span>,</span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a>      <span class="at">silent =</span> T</span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a>    )</span>
+<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a>    pcaData <span class="ot">&lt;-</span> <span class="fu">getKsPCAData</span>(</span>
+<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a>      <span class="at">data =</span> dat, <span class="at">replicate =</span> <span class="st">&quot;replicate&quot;</span>,</span>
+<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a>      <span class="at">xRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">yRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a>      <span class="at">agents_df =</span> cells_interactions,</span>
+<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a>      <span class="at">silent =</span> <span class="cn">TRUE</span></span>
+<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a>    )</span>
+<span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a>    pcaMeta <span class="ot">&lt;-</span> <span class="fu">simulateMeta</span>(pcaData,</span>
+<span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a>      <span class="at">metaInfo =</span> <span class="fu">data.frame</span>(</span>
+<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a>        <span class="st">&quot;var&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>),</span>
+<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a>        <span class="st">&quot;rdist&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;rnorm&quot;</span>),</span>
+<span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a>        <span class="st">&quot;outcome_0&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;25&quot;</span>),</span>
+<span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a>        <span class="st">&quot;outcome_1&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;25&quot;</span>)</span>
+<span id="cb4-45"><a href="#cb4-45" tabindex="-1"></a>      )</span>
+<span id="cb4-46"><a href="#cb4-46" tabindex="-1"></a>    )</span>
+<span id="cb4-47"><a href="#cb4-47" tabindex="-1"></a>    info[[i]] <span class="ot">&lt;-</span> <span class="fu">list</span>(dat, pcaData, pcaMeta)</span>
+<span id="cb4-48"><a href="#cb4-48" tabindex="-1"></a>    rfdata[[i]] <span class="ot">&lt;-</span> pcaMeta</span>
+<span id="cb4-49"><a href="#cb4-49" tabindex="-1"></a>  }</span>
+<span id="cb4-50"><a href="#cb4-50" tabindex="-1"></a></span>
+<span id="cb4-51"><a href="#cb4-51" tabindex="-1"></a>  <span class="do">## Save RDS (To temp directory)</span></span>
+<span id="cb4-52"><a href="#cb4-52" tabindex="-1"></a>  <span class="fu">saveRDS</span>(info, <span class="fu">paste0</span>(path, <span class="st">&quot;change_sim_small_info&quot;</span>, c, <span class="st">&quot;.rds&quot;</span>))</span>
+<span id="cb4-53"><a href="#cb4-53" tabindex="-1"></a>  <span class="fu">saveRDS</span>(rfdata, <span class="fu">paste0</span>(path, <span class="st">&quot;change_sim_small_rfdata&quot;</span>, c, <span class="st">&quot;.rds&quot;</span>))</span>
+<span id="cb4-54"><a href="#cb4-54" tabindex="-1"></a>}</span></code></pre></div>
+<p>After generation, the model is fit on all of these data sets.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="cf">for</span> (c <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(changes)) {</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">- Change: &quot;</span>, changes[c], <span class="st">&quot;</span><span class="sc">\n</span><span class="st">-- (&quot;</span>, nSims, <span class="st">&quot;): &quot;</span>))</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  rfdat <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">paste0</span>(path, <span class="st">&quot;change_sim_small_rfdata&quot;</span>, c, <span class="st">&quot;.rds&quot;</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  VarVI_both <span class="ot">&lt;-</span> VarVI_noi <span class="ot">&lt;-</span> VarVI_int <span class="ot">&lt;-</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>    VarVI_maxint <span class="ot">&lt;-</span> VarVI_bothmax <span class="ot">&lt;-</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="st">&quot;var&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>      <span class="st">&quot;age&quot;</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>      <span class="fu">paste</span>(cells_interactions<span class="sc">$</span>X1,</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>        cells_interactions<span class="sc">$</span>X2,</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>        <span class="at">sep =</span> <span class="st">&quot;_&quot;</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>      )</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>    ))</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>  <span class="fu">set.seed</span>(c <span class="sc">*</span> <span class="dv">12345</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nSims) {</span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">paste0</span>(i, <span class="st">&quot;, &quot;</span>))</span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>    <span class="co"># Generate</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>    rfcv <span class="ot">&lt;-</span> <span class="fu">funkyModel</span>(</span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>      <span class="at">data =</span> rfdat[[i]],</span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>      <span class="at">outcome =</span> <span class="st">&quot;outcome&quot;</span>, <span class="at">unit =</span> <span class="st">&quot;unit&quot;</span>,</span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a>      <span class="at">metaNames =</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>), <span class="at">silent =</span> <span class="cn">TRUE</span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>    )</span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a>    <span class="co"># Org Data</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a>    tmp <span class="ot">&lt;-</span> rfcv<span class="sc">$</span>VariableImportance[, <span class="fu">c</span>(<span class="st">&quot;var&quot;</span>, <span class="st">&quot;est&quot;</span>, <span class="st">&quot;sd&quot;</span>)]</span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a>    tmp <span class="ot">&lt;-</span> tmp[<span class="fu">order</span>(<span class="sc">-</span>tmp<span class="sc">$</span>est), ]</span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a>    <span class="fu">rownames</span>(tmp) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a>    tmp<span class="sc">$</span>CutoffNoise <span class="ot">&lt;-</span> rfcv<span class="sc">$</span>NoiseCutoff</span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a>    tmp<span class="sc">$</span>CutoffInterp <span class="ot">&lt;-</span> rfcv<span class="sc">$</span>InterpolationCutoff</span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a>    tmp<span class="sc">$</span>CutoffMaxInterp <span class="ot">&lt;-</span> <span class="fu">max</span>(rfcv<span class="sc">$</span>InterpolationCutoff)</span>
+<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a></span>
+<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a>    <span class="co"># Above Lines</span></span>
+<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a>    tmp<span class="sc">$</span>TF_intCO <span class="ot">&lt;-</span> (tmp<span class="sc">$</span>est <span class="sc">&gt;</span> tmp<span class="sc">$</span>CutoffInterp)</span>
+<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a>    tmp<span class="sc">$</span>TF_noiCO <span class="ot">&lt;-</span> (tmp<span class="sc">$</span>est <span class="sc">&gt;</span> tmp<span class="sc">$</span>CutoffNoise)</span>
+<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a>    tmp[[<span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i)]] <span class="ot">&lt;-</span> tmp<span class="sc">$</span>TF_intCO <span class="sc">*</span> tmp<span class="sc">$</span>TF_noiCO</span>
+<span id="cb5-40"><a href="#cb5-40" tabindex="-1"></a>    VarVI_both <span class="ot">&lt;-</span> <span class="fu">merge</span>(VarVI_both, tmp[, <span class="fu">c</span>(<span class="st">&quot;var&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i))])</span>
+<span id="cb5-41"><a href="#cb5-41" tabindex="-1"></a>    tmp[[<span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i)]] <span class="ot">&lt;-</span> tmp<span class="sc">$</span>TF_noiCO</span>
+<span id="cb5-42"><a href="#cb5-42" tabindex="-1"></a>    VarVI_noi <span class="ot">&lt;-</span> <span class="fu">merge</span>(VarVI_noi, tmp[, <span class="fu">c</span>(<span class="st">&quot;var&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i))])</span>
+<span id="cb5-43"><a href="#cb5-43" tabindex="-1"></a>    tmp[[<span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i)]] <span class="ot">&lt;-</span> tmp<span class="sc">$</span>TF_intCO</span>
+<span id="cb5-44"><a href="#cb5-44" tabindex="-1"></a>    VarVI_int <span class="ot">&lt;-</span> <span class="fu">merge</span>(VarVI_int, tmp[, <span class="fu">c</span>(<span class="st">&quot;var&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i))])</span>
+<span id="cb5-45"><a href="#cb5-45" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" tabindex="-1"></a>    tmp<span class="sc">$</span>TF_maxIntCO <span class="ot">&lt;-</span> (tmp<span class="sc">$</span>est <span class="sc">&gt;</span> tmp<span class="sc">$</span>CutoffMaxInterp)</span>
+<span id="cb5-47"><a href="#cb5-47" tabindex="-1"></a>    tmp[[<span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i)]] <span class="ot">&lt;-</span> tmp<span class="sc">$</span>TF_maxIntCO <span class="sc">*</span> tmp<span class="sc">$</span>TF_noiCO</span>
+<span id="cb5-48"><a href="#cb5-48" tabindex="-1"></a>    VarVI_bothmax <span class="ot">&lt;-</span> <span class="fu">merge</span>(VarVI_bothmax, tmp[, <span class="fu">c</span>(<span class="st">&quot;var&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i))])</span>
+<span id="cb5-49"><a href="#cb5-49" tabindex="-1"></a>    tmp[[<span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i)]] <span class="ot">&lt;-</span> tmp<span class="sc">$</span>TF_maxIntCO</span>
+<span id="cb5-50"><a href="#cb5-50" tabindex="-1"></a>    VarVI_maxint <span class="ot">&lt;-</span> <span class="fu">merge</span>(VarVI_maxint, tmp[, <span class="fu">c</span>(<span class="st">&quot;var&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i))])</span>
+<span id="cb5-51"><a href="#cb5-51" tabindex="-1"></a>  }</span>
+<span id="cb5-52"><a href="#cb5-52" tabindex="-1"></a></span>
+<span id="cb5-53"><a href="#cb5-53" tabindex="-1"></a>  <span class="do">## Save RDS</span></span>
+<span id="cb5-54"><a href="#cb5-54" tabindex="-1"></a></span>
+<span id="cb5-55"><a href="#cb5-55" tabindex="-1"></a>  results[[<span class="fu">paste0</span>(<span class="st">&quot;Change_&quot;</span>, changes[c])]] <span class="ot">&lt;-</span></span>
+<span id="cb5-56"><a href="#cb5-56" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb5-57"><a href="#cb5-57" tabindex="-1"></a>      <span class="st">&quot;dat&quot;</span> <span class="ot">=</span> tmp, <span class="st">&quot;fullDat&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb5-58"><a href="#cb5-58" tabindex="-1"></a>        rfcv<span class="sc">$</span>VariableImportance,</span>
+<span id="cb5-59"><a href="#cb5-59" tabindex="-1"></a>        rfcv<span class="sc">$</span>NoiseCutoff,</span>
+<span id="cb5-60"><a href="#cb5-60" tabindex="-1"></a>        rfcv<span class="sc">$</span>InterpolationCutoff</span>
+<span id="cb5-61"><a href="#cb5-61" tabindex="-1"></a>      ),</span>
+<span id="cb5-62"><a href="#cb5-62" tabindex="-1"></a>      <span class="st">&quot;VarVI_both&quot;</span> <span class="ot">=</span> VarVI_both,</span>
+<span id="cb5-63"><a href="#cb5-63" tabindex="-1"></a>      <span class="st">&quot;VarVI_noi&quot;</span> <span class="ot">=</span> VarVI_noi,</span>
+<span id="cb5-64"><a href="#cb5-64" tabindex="-1"></a>      <span class="st">&quot;VarVI_int&quot;</span> <span class="ot">=</span> VarVI_int,</span>
+<span id="cb5-65"><a href="#cb5-65" tabindex="-1"></a>      <span class="st">&quot;VarVI_bothmax&quot;</span> <span class="ot">=</span> VarVI_bothmax,</span>
+<span id="cb5-66"><a href="#cb5-66" tabindex="-1"></a>      <span class="st">&quot;VarVI_maxint&quot;</span> <span class="ot">=</span> VarVI_maxint</span>
+<span id="cb5-67"><a href="#cb5-67" tabindex="-1"></a>    )</span>
+<span id="cb5-68"><a href="#cb5-68" tabindex="-1"></a></span>
+<span id="cb5-69"><a href="#cb5-69" tabindex="-1"></a>  <span class="do">## Save RDS</span></span>
+<span id="cb5-70"><a href="#cb5-70" tabindex="-1"></a>  <span class="fu">saveRDS</span>(results, <span class="fu">paste0</span>(path, <span class="st">&quot;change_sim_small_&quot;</span>, c, <span class="st">&quot;.rds&quot;</span>))</span>
+<span id="cb5-71"><a href="#cb5-71" tabindex="-1"></a>}</span></code></pre></div>
+<p>The data is then summarized together:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">11</span>) {</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  data <span class="ot">&lt;-</span> <span class="fu">append</span>(</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>    data,</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    <span class="fu">readRDS</span>(<span class="fu">paste0</span>(path, <span class="st">&quot;change_sim_small_&quot;</span>, i, <span class="st">&quot;.rds&quot;</span>))</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  )</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>}</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>data_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>  <span class="st">&quot;var&quot;</span> <span class="ot">=</span> changes, <span class="st">&quot;noi&quot;</span> <span class="ot">=</span> <span class="cn">NA</span>, <span class="st">&quot;int&quot;</span> <span class="ot">=</span> <span class="cn">NA</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="st">&quot;both&quot;</span> <span class="ot">=</span> <span class="cn">NA</span>, <span class="st">&quot;max&quot;</span> <span class="ot">=</span> <span class="cn">NA</span>, <span class="st">&quot;bothmax&quot;</span> <span class="ot">=</span> <span class="cn">NA</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>)</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(data)) {</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  data_summary[i, <span class="st">&quot;noi&quot;</span>] <span class="ot">&lt;-</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>    <span class="fu">sum</span>(data[[i]]<span class="sc">$</span>VarVI_noi[data[[i]]<span class="sc">$</span>VarVI_noi<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>]) <span class="sc">/</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>      <span class="fu">length</span>(data[[i]]<span class="sc">$</span>VarVI_noi[data[[i]]<span class="sc">$</span>VarVI_noi<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>  data_summary[i, <span class="st">&quot;int&quot;</span>] <span class="ot">&lt;-</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>    <span class="fu">sum</span>(data[[i]]<span class="sc">$</span>VarVI_int[data[[i]]<span class="sc">$</span>VarVI_int<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>]) <span class="sc">/</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>      <span class="fu">length</span>(data[[i]]<span class="sc">$</span>VarVI_int[data[[i]]<span class="sc">$</span>VarVI_int<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>  data_summary[i, <span class="st">&quot;max&quot;</span>] <span class="ot">&lt;-</span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a>    <span class="fu">sum</span>(data[[i]]<span class="sc">$</span>VarVI_max[data[[i]]<span class="sc">$</span>VarVI_max<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>]) <span class="sc">/</span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a>      <span class="fu">length</span>(data[[i]]<span class="sc">$</span>VarVI_max[data[[i]]<span class="sc">$</span>VarVI_max<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>  data_summary[i, <span class="st">&quot;both&quot;</span>] <span class="ot">&lt;-</span></span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a>    <span class="fu">sum</span>(data[[i]]<span class="sc">$</span>VarVI_both[data[[i]]<span class="sc">$</span>VarVI_both<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>]) <span class="sc">/</span></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a>      <span class="fu">length</span>(data[[i]]<span class="sc">$</span>VarVI_both[data[[i]]<span class="sc">$</span>VarVI_both<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a></span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a>  <span class="co"># (max either)</span></span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a>  data_summary[i, <span class="st">&quot;bothmax&quot;</span>] <span class="ot">&lt;-</span></span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a>    <span class="fu">sum</span>(data[[i]]<span class="sc">$</span>VarVI_bothmax[data[[i]]<span class="sc">$</span>VarVI_bothmax<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>]) <span class="sc">/</span></span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a>      <span class="fu">length</span>(data[[i]]<span class="sc">$</span>VarVI_bothmax[data[[i]]<span class="sc">$</span>VarVI_bothmax<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a>}</span>
+<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a></span>
+<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a>data_plot <span class="ot">&lt;-</span> tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(data_summary, <span class="at">cols =</span> noi<span class="sc">:</span>bothmax)</span></code></pre></div>
+<p>And a power curve is built:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>plot_sm <span class="ot">&lt;-</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">ggplot</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>    data_plot[data_plot<span class="sc">$</span>name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;noi&quot;</span>, <span class="st">&quot;int&quot;</span>, <span class="st">&quot;both&quot;</span>), ],</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> var, <span class="at">y =</span> value, <span class="at">color =</span> name, <span class="at">group =</span> name)</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.25</span>) <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_vline</span>(</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">xintercept =</span> baseline),</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>, <span class="at">linewidth =</span> <span class="fl">1.25</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_hline</span>(</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">yintercept =</span> <span class="fl">0.05</span>),</span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">&quot;dotted&quot;</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme</span>(</span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>    <span class="at">axis.text =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">18</span>),</span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>    <span class="at">axis.title =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">22</span>),</span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>    <span class="at">legend.title =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">22</span>),</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a>    <span class="at">legend.text =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">18</span>)</span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">xlab</span>(<span class="st">&quot;Standard Deviation&quot;</span>) <span class="sc">+</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">ylab</span>(<span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">scale_color_discrete</span>(<span class="at">type =</span> <span class="fu">c</span>(<span class="st">&quot;#40e0d0&quot;</span>, <span class="st">&quot;orange&quot;</span>, <span class="st">&quot;red&quot;</span>))</span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a></span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a>plot_sm</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">&quot;img/change_sm_curve_show.png&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAAMgCAMAAADsrvZaAAABLFBMVEUAAAAAADoAAGYAOjoAOmYAOpAAZrYzMzM6AAA6OgA6Ojo6OmY6OpA6ZmY6ZpA6ZrY6kJA6kLY6kNtA4NBNTU1NTW5NTY5Nbo5NbqtNjshmAABmOgBmOjpmZgBmZmZmkJBmkLZmkNtmtttmtv9uTU1ubm5ujqtujshuq+SOTU2Obk2Obm6Oq8iOyOSOyP+QOgCQZjqQZmaQkDqQkLaQtraQttuQ2/+rbk2rjm6ryKuryOSryP+r5P+2ZgC2Zjq2kDq2kGa2tra229u22/+2///Ijk3Ijm7I5P/I///bkDrbtmbbtpDbtrbb27bb2//b///kq27kyI7kyKvk///r6+v/AAD/pQD/tmb/yI7/25D/27b/29v/5Kv/5Mj/5OT//7b//8j//9v//+T///+UaR9iAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAgAElEQVR4nO2dj5vdxnWeV44T2W5rt9pLUYrbxKm2kig3stPWlpyKSRqbpqhUMm3evdrKS5si/v//ocDFjzsHMwBmgJk5H4DvfR6Ju5dY4PDgvHvmALi7VwUhZJAr7QAIQYaCEDICBSFkBApCyAgUhJARKAghIywR5E1CNksMQeSnxwW7isWGY7i6CjhXCHkwQYtnOiAKkgwKYoMWDwVRhILYoMVDQRRhDDZo8VAQRRiDDVo8FEQRxmCDFg8FUYQx2KDFQ0EUYQw2aPFQEEUYgw1aPBREEcZggxYPBVGEMdigxUNBFGEMNmjxUBBFGIMNWjwURBHGYIMWDwVRhDHYoMVDQRThw4o2aPFQEEUoiA1aPBREEQpigxYPBVGEgtigxUNBFKEgNmjxUBBFKIgNWjwURBEKYoMWDwVRhILYoMVDQRShIDZo8VAQRSiIDVo8cwV59ehdudnLTw+Hw/tPHZ8UFGQACmKDFs9cQZ4cpCCvHh0qHnxmfWLuw/eYGdhwDBQkJrMEef3kIAV5/cnhnafFy/L/L3qfiH34HjMDjKEGIQYTtHhmCfLyo0NPkPubtz8vzq3j494nYh+Dx7y+vg6IOQYIJ2LXMQyc8ojxRCmq6Z3YgtwdDh/8XgryvPn0+eHD3idiHw39JFzXBIS9nF0Xp4FSDIOnPFo8UYrKZycOQR7+YymJEORJ0yzuqmWV+ETso4GC1Ow4hk0LUiEFKaeO2on7m3deiE/kPhp6SbhuuQ2JfSE7Lk6BTgyXU56KKEfodjL2b/ER5NWj5opVNX6IT4r6t+ccx3D/W0a/hKybtQky9m9ZLEjh30EGGPN3Lvv97i1hB/HZydi/Jb0gQekaifR0Oo39Q8Zj0GDHMXAGKfxnEDOM6wBZ5E5ONaP/lpEYNNhvDLc7E2ThVSzravO1xKuxUJBZqMTQLF9cf7WF+yAVdzHvgwyGJqhfHTLkdAozZLfF2UMjhrMfA3+HkBPBzGex7uLeSR/EbUkNBYmAQgxjfkDkRBBHkHLueGg+i/Uw7rNYY5rUUJAL4A8r1uurob9FOC+CpYI0j/Xe3xgP8IpPzH34HtPJhCWNH74XhRFOxC4FGfcD4rwIIgmS6/0gw5acTuWnlSB+hiCciD0Kcl4Oj8y9COdFsMp3FLo0Ma54+ewC4UTsUJApPyDOi2CVgpzpW1JzmrqdGDWGZexPkNoPCjK0D99j+jPbEIQTsTtBpv2AOC+ClQtSI5ZbfoYgnIi9CeLhB8R5EWxCkMJwpBrXPQxBOBE7FOTkvEhvgHBeBFsRpLgI0hgyrgjCidiZID5+QJwXweYE8TQE4UTsSxCfBRbGeRFsRpD6ubL2ou+kIQgnYleC3Ho1EIjzItiQIGc6QyYUQTgRexLE0w+I8yLYmiC+hiCciB3F4OsHRE4EmxPE0xCEE7GfGFo/KMj4PnyPuYyLISOKIJyI3cTg7wdETgQbFMTLEIQTsZcYAvyAyIlgi4L4GIJwInYSQ/1+Nj8/IHIi2KQgpiEDiiCciH3E0PlBQSb34XvM5UwagnAidhFDmB8QORFsVJBJQxBOxB5iqP3w/wkjCDkRbFWQzpBOEYUYJthBDBc/KIjHPnyPGQXLEKEIwonYfgzBfkDkRLBdQcYNQTgR24+h9iPkR7gh5ESwYUFGDUE4EZuP4eIHBfHah+8xYyEMKYQiCCdi6w8rhi+wMM6LYNOCjBiCcCI2Lsht+AIL47wIti3IsCEIJ2LbgtzOWGBhnBfBxgXpGXJRBOFEbFqQeX5AnBfB1gWRhlyaCMKJ2LIgrR+hv4QA4bwINi/IgCEIJ2LDgph+UJBJVAUxzpGxzEI4EdsVZLYfFMTrmJFxGpI5BhebFaT2I3wASRXPEvYgCKohWxWk82PGb0GjID7HjE7fEAxFNiqI8IOC+KAuCKYh2xRkkR8UxOuYCegbcgQwZJOCXPyY9WtmKYjPMVPQM+RYn0qNSDoQiiF2DNIPCuIHgiDFtbghUsWg3UQQiiGBIEv8gMiJYD+C9AwBGEQQiiFyDLUfsxdYGDkR7EgQ66a6tiEIxRA3hqULLIycCHYliH0xS1URhGKIGsNyPyByItiXIJfzdgQwBKEYYsZg+DFzgYWRE8HOBOkMOQL0EIRiiBhDzw8K4g+QIO2pO15WWWqKIBRDvBii+AGRE8HuBGlOXhWDtiEIxRAthjh+QOREsD9B6tN3jkHZEIRiiBXDrXGBd/YAEjGeaOxQkLMhdQzdKVVRRDsPFZFi6PtBQYIAE6R3tVetiajnoYgVQzQ/IHIi2KUgIIZs5mFF4ceSBRZCbfTYpyDmdzm9ZdZWBLH8oCCB4AkCYchGBInpB0RtCPYqyBHAkG0Ick5Zl8FlCyyM2hDsVhB3D8n6JpHNCCL9oCDBQAoyYkgmRTYhSONHnAUWRm0IdiyIuiFbEEQOIEsXWBi1IdizINqGbEAQ2w8KMgNUQQYMyaXI+gWJ7gdEbQj2LUjfkLxNZPWCxPcDojYEOxdE1ZC1C9K7wLt8AFkYTxL2Loj4tpd5mbVyQRx+UJB5IAuiaAhWHkJp/Yi5wMLIiYCC6BkClocw+n5EWWBh5ERAQYYNSa0IWh5CcPlBQeYCLoiWIXB58OS2JoUfEDkRUJAKHUPw8uDDrcuPSAssjJwIKMiZQUNSPr0ImAcPWj+Knh8UZD74gkwYkkYRxDxM0jaQ2yR+QOREQEEa+oZkWGZB5mGKIUG04kkNBWm5NhTJYwhmHiYwBOlei9dAIHIioCAd11PLrNiagOZhgnPvSOUHRE4EFMRgwpDYnQQ2D6OcGi6vRPQDIicCCmLiYUjyGPIyW5DLCzEbCEROBBREkNWQVT6seOp3kKh+QNSGgIJIxm8ZUhBLkLh+QNSGgIL0GH10kYK4BAndRdR4UkNB+kwYkiWGRSR+P0jSBgJRGwIKYjFgCAWpEYLE9gOiNgR5BDmuivOvR2g4F0PzceWHUkghlIIk3f/tJSNHI1N7ZX8dZPixk8h3CtfZQcwsRG8gELUh4BLLhTjxF0MoSMUlC/H9gKgNAQVxksWQLQgS/uXjINSGgIK4cRtCQQojCQkaCERtCCjIAE5DKEhxSUIKPyBqQ0BBhrANOT/FmjWGWSQWpHrS/fxBCj8gakNAQQaxDOk9pJcjhuTMFyRJA4HIiYCCDOM0BP9RkyBmC5LGD4icCCjICNb9kLgtZDV5ENSCJPIDIicCCjJG/124FMQQJEE0GDkRUJBRLoZQkIbzRaxUDQQiJwIKMo5lCGeQ2+vrZH5A5ERAQSboaqEVJJ4hq8pDx3VKPyByIqAgU8geEvNW4bry0EJBJLsXRBqye0Gur5MagpATAQWZxlxlURAKIqEgF0Oqa1gRDVldHiooSA8KUghD9i7ILWcQCQWpOJdE+d8aBEn7sCIF6UFBznQri90Lcr4PEvpV3iDUhoCCeEJBaihIDwpSk6CFrFeQ0C/yB6E2BBTEEwpSQ0F6UJAaClJDQXpQkIbGj4iXsSiIDUJtCCiIL60g8W4VrlGQ6t0gFMSEgnSc/Yh4J4SC2CDUhoCCBEBBKIgFBblAQSiIBQW5QEFS3yeEqA0BBQmgFiTalL7GPFCQPhTEIG4LWWMeEl/lhciJgIKEQEEoSB8KYkBBKEgfCmIQdwhZYx4oSB8KYrB7QVJf5YXIiYCCBBF1jbXCPFAQCwpiQkEoSA8KYkJBKEgPCmISdQhZYR5S3yeEyImAggRRVUe0FrLCPFAQCwoiiLnGWmEeUl/lhciJgIKEsQJBUj6sSEEsKIiAglAQCQURxJzSKYgNQm0IKEgYMaf09QmS/CovRG0IKEgYFISCSCiIJOIQQkFsEGpDQEECiTiErFKQtLdBIGpDQEECoSAUREBBJBGHEApig1AbAgoSCAWhIAIK0iPelL5SQQLDCQOhNgQUJJR4QwgFsUGoDQEFCQVekCAoyAQUJJR4Q8jq8pD+NghETgQUJBQKkhKEnAgoSDDR1lirywMFcUBB+uxakMRXeSFyIqAgwVCQhCDkREBBgok2hKwuDxTEAQXpQ0ESgpATAQUJphFk+RprdXlIfxsEIicCChJOrCFkdXmgIA4oiEWsNdbq8kBBHFAQi70KkuE2CEROBBQknFhDyNoeVqQgLiiIBQVJB0JtCCjIDCJN6SsUJPVVXojaEFCQGUQaQiiIDUJtCCjIDChIMhBqQ0BBZhBpCKEgNgi1IaAgM6AgyUCoDQEFmUOcKX2VggSHEwZCbQgoyBziDCEUxAahNgQUZA67FCTHbRCI2hDMEeTlp4fD4f2nlxdef3Joefvzonj16PKx2IfvMTMQRZCFaywKYoNQG4IZgjT1/+Cz7pWeIPc3FCR9DIMkFCT5jA5RG4JwQUob3nlavCz//6K/7f3N2Zq7w7vuffgeMwMbFiQICjJBuCD3N+fOUPaRj3ublup8WP35pP7D3ofvMTOwMIYoQ8jK8kBBnFiCPG/6w/O+BuUr56by+hNj9SX24XvMDMQRZFkLWVkeKIgTS5AnTee466+x2p7y6tHbv/rocHh4sYSCpIghChRkgmBBynVULcj9TU+QJ40x7Yx+6TAUJEUMUaAgEwQL8upRs4BqZpGObii5O1RT/J8+ba5zvVly3BplpRyP9RCiHUo2zoJoB4GHtyDP2yVX+8GT7mLW9jpIlCl9ZXnIcSMdIieCaB2kvYR14TKkbFeQRWusdeUhy31CiJwIos0g/YZivkJBksQQAwoyQbSrWM/7dwcpSOoYYhAkSPoZHSIngmj3Qbq7g12L2fwSa+kQsq48UBA3nnfSu9GkG86NoWTDgixpIevKAwVx43oW66H9LJYxgtzfHD54Ubz8aMMPKxZR1ljreliRgrixn+ZtbgTWHaO9lmtOJM8Pvcd9KUiaGNxQkJgsfT+IS5Di5U9LPT64fE5B0sTghoLEhO8onEmEKX2FgswIJwyE2hBQkJlEmNIpiA1CbQgoyFyWr7FWJUie+4QQtSGgIHOhIClAqA0BBZnL/gTJMKND1IaAgsxl+ZROQWwQakNAQeayfEqnIDYItSGgILNZvMaiIDYItSGgILOhIAlAqA0BBZnN4iFkVXmgIANQkCEWDyGrygMFGYCCDLFDQVJGUoOQEwEFmc2uBMl0nxAiJwIKMp+lU/qa8pBphQWREwEFmc/SKX1NeaAgQ1CQQZausdaUBwoyBAUZhILEByEnAgoyHwoSH4ScCCjIAhZO6WvKAwUZgoIMs7CFrCkPFGQICjIMBYkOQk4EFGQBmIIkeVgx0410iNoQUJAF7EeQXDfSIWpDQEGWsGxKX5cgWVZYELUhoCBLWNZCKIgNQm0IKMgSKEhsEGpDQEGWQEFig1AbAgqyBAoSG4TaEFCQJXSCzDKEgtgg1IaAgixiUQuhIDYItSGgIIugIJFBqA0BBVkEBYkMQm0IKMgidiJIthvpELUhoCCLqL+tzjRkPXnI1kAgciKgIMtY0kLWkwcKMgwFGYWCxAUhJwIKsgwKEheEnAgoyDIoSFwQciKgIMtYMqWvJw8UZBgKMs6CFrKePFCQYSjIOBQkKgg5EVCQhVCQqCDkREBBFrLggd7V5CGfHxA5EVCQhSyY0leTBwoyAgUZh4JEBSEnAgqylPlDyGoeVqQgI1CQCShITBBqQ0BBljJ/SqcgNgi1IaAgS5k/hFAQG4TaEFCQpVCQmCDUhoCCLGb2EEJBbBBqQ0BBFjN7CKEgNgi1IaAgi5m9xlqLIKdcv/ugwKgNAQVZzOYFydhAIGpDQEEWQ0EiglAbAgqyGAoSEYTaEFCQ5cyd0imIDUJtCCjIcua2kLXkgYKMQUEmoSDxQMiJgIIsh4LEAyEnAgqyHAoSD4ScCChIBGZO6SvJw4mCjEFBppnZQlaSBwoyCgWZZtuC5PQDIicCChIBChINhJwIKEgELoIEGbKSPFCQUSiIB/Om9JXkgYKMQkE8mLfGWkkeKMgoFMQDChILhJwIKEgMoASJ/bAiBRmFgngwb0qnIDYItSGgIDFoCiiwhaxDkKz3CSFqQ0BBojBrjUVBbBBqQ0BBorBhQbL6AVEbgjyCHLdOWULl/0tBjseyoHRjKQWJubtakJh73BbsID7MmtLZQWwQakPAJVYUZk3pFMQGoTYEFCQOc4YQCmKDUBsCChIHChIHhNoQUJA4zBlCKIgNQm0IKEgcKEgcEGpDQEHiMGdKX0Ue8t4nhMiJgIJEYsYQsoo8UJAJKIgfM9ZYq8hDXj8gciKgIJGgIFFAyImAgkSCgkQBIScCChKJGVP6KvJAQSagIH5QkCgg5ERAQWIRvsZaRR4oyAQUxBMKEgOEnAgoSCy2KUjm2yAQORFQkFiEDyFryAMFmdqAgnhCQWKAkBMBBYlG8BprDQ8rVv8SCjIGBfFlq4Lk9AOiNgQUJBrBaywKYoNQGwIKEg0KEgGE2hBQkGgYgvgZQkFsEGpDQEHiETqEUBAbhNoQUJB4UJDlINSGgILEI3QIWYEguW+DQNSGgILEg4IsB6E2BBQkHqFTOgWxQagNAQWJxwYFyX0jHaI2BBQkIoFT+joEyeoHRG0IKEhEAoeQFeSBglCQiASusVaQBwpCQSJCQRaDkBMBBYkIBVkMQk4EFCQmYVP6CvJAQShITMKmdPw8ZL8NApETAQWJSdgaCz8PFISCRIWCLAUhJwIKEpOtCZL9RjpETgQUJCZtMfkNIfh5oCAUJC5BLQQ/D9lXWBA5EVCQqFCQhSDkREBBooIgSMSHFSkIBYkLBVkIQm0IKEhUgqZ0eEHyX+WFqA0BBYlLSAuhIDYItSGgIHGhIMtAqA0BBYkLBVkGQm0IKEhcNiVI/vuEELUhoCBxCZnSKYgNQm0IKEhkAlrIGgTJ7AdEbQgoSGQoyCIQakNAQSJDQRaBUBsCChIZCrIIhNoQUJDImFP6hCHoeVC4yguREwEFiQwFWQRCTgQUJDb+ayz0PFCQgoLEh4IsASEnAgoSG/9bheh5ULhPCJETAQWJjf8Qgp4HClJQkPhsSpDcfkDkREBBouM9hKDngYIUFCQBFGQBCDkRUJDoeK+x0PNAQQoKkoCtCKJxlRciJwIKEh0KsgCEnAgoSHx8hxDwhxUpSAUFiQ8FmQ9CbQgoSHx811jggmjcJ4SoDQEFiQ8FmQ9CbQgoSHwoyHwQakNAQeKzHUGy+wFRGwIKkgDPKZ2C2CDUhoCCJMCzhWALonIRC6I2BBQkARRkNgi1IaAgCaAgs0GoDcEcQV5+ejgc3n9qbvXq0eHM25+7NqAgOWOgIDGZIUgjw4PPjK3ubwxBrA32JoiY0ocNoSA2CLUhCBfk9SeHd54WL8v/v7hsdXd4txjeYK+CTLQQ7Dyo3AaByIkgXJD7m7ZNfHzZ6snhw2J4AwqiEIMfFGSCcEGeN83iueHE60+MBZe9AQVRiMEPCjJBuCBPmsZwZ6yxXj16+1cfHQ4PP3NvQEEUYvBjVJD8fkDkRBAsSDlh1PV/f3MRpJ3Rq57h2GB3gvgZgp0HCnImWJBXj5rVVDNqnLk7VHP5nz6trlz1N3iz5Lg3ytI6/1kKcjyWpaYczgyai1jaYeDjJcjzZjX1pBw/HBuwg2jE4MVgDDpXeSFyIojTQVqqsYOCFBRkNgg5EcSZQVoqJziDFD1BhgyBzgMFqYlzFavl3DR4FesiyGgLgc4DBamJch+kaxpnJ3gfpPBbY0HnQec2CEROBHHupD+pnShF+ZB30s9QkHkg5EQw61msh/1nse5vDh+8KF5+dH5Y0d6AguQUJM7DihSkZsbTvM1dwQfNbfNz73h+MF4TG5j78D1mBrIKMmAIBbFBqA3B0veDNIIUL39aGvHBC3sDcx++x8xALkHGWgiyIEozOkRtCPiOwkR4rLEoiA1CbQgoSCIoyCwQakNAQRLhMYRQEBuE2hBQkERQkFkg1IaAgiTCY0qnIDYItSGgIKmYHkKQBVG6ygtRGwIKkgoKMgeE2hBQkFRMDyEUxAahNgQUJBXTQwgFsUGoDQEFSYWaIEEMxKA1o0PkREBBUkFB5oCQEwEFScbklA6cBwrSQkGSMTmlA+eBgrRQkGRMrrGA80BBWihIMijIDBByIqAgyVizIFpXeSFyIqAg6ZgaQoDzQEFaKEg6KEg4CDkRUJB0TK2xgPNAQVooSDrWK4jajA6REwEFSQcFCQchJwIKkg4piG0I7sOKFKSDgiRkYkqnIDYItSGgIAmZWGNREBuE2hBQkIRQkGAQakNAQRIyMYRQEBuE2hBQkISsVhC12yAQtSGgICkZX2NREBuE2hBQkJSsVJATBemgICmhIKEg1IaAgqRkfAiBFkTHD4jaEFCQlFCQUBBqQ0BBkjK6xqIgNgi1IaAgSdEQJAgKMgEFScroGgs2DxTkAgVJCgUJBCEnAgqSlHUKoneVFyInAgqSlEuZOYYQ2DxQkAsUJC1jUzpqHhTvE0LkREBB0jK2xkLNAwUxoCBpWasgSn5A5ERAQdJCQcJAyImAgqRlbEpHzQMFMaAgiRmZ0lHzQEEMKEhiRtZYqHmgIAYUJDH5BVn8sCIFMaAgibEF6QxBFUTxKi9EbQgoSGLklH5bkzQGChITCpIa0ULWIIjmfUKI2hBQkNSYgtzemoZQEBuE2hBQkNRQkBAQakNAQVJjDiGrEUTLD4jaEFCQ1IgpfS0zCAVpoSCpoSAhINSGgIIkx3rYpL0RQkFsEGpDQEGSM3gvnYLYINSGgIIkx36gF3uJpXkRC6I2BBQkOT1BitSCBGHHoHqVFyInAgqSHAoSAEJOBBQkPUNDCGYeKIiAgqRn6IFezDxQEAEFSc/QGgszD6oXsSByIqAg6aEg/iDkREBB0kNB/EHIiYCCZGBgCMHMAwURUJAM9AQpKMggCDkRUJAMDKyxMPOgehELIicCCpKBNQmie5UXIicCCpIBhyC3uWMYgIJMQEEy0BekSCrIsocVKYiEguTAvcaiIDYItSGgIDlYmSB6fkDUhoCC5MA9hFAQG4TaEFCQHAhBuhZCQWwQakOQR5Djzikrrv7gVHMsqzDZwUpBFnx1I0i0aDYPO0gM2u/JjSDsIEMg1IaAS6wsNCV3ajkPIZCC6F7EgqgNAQXJQl+QAlUQ5au8ELUhoCBZoCCeINSGgIJkoT+DUJABEGpDQEGy4BLkloLYINSGgILkwXxLSPs4FmIeKEgPCpIH161CxDwoX+WFqA0BBcmDUXQUZASEnAgoSB5cgtyObJ8LCjIBBcmDJUhBQVwg1IaAgmTC/byiOr08aM/oELUhoCCZcK2xcsfggIJMQEEyATqEUJAJKEgmQIcQCjIBBcmEFARmjUVBJqAgucAcQijIBBQkF5hDiEMQTT8gakNAQXKRbY215GFFCtKHguTCrDsKMgRCbQgoSC4oiA8ItSGgILlwCpLCkAWCqM/oELUhoCDZsIaQIwWxQKgNAQXJhtVCKIgNQm0IKEg2KIgHCLUhoCDZcAqSwBAKEhMKko2eIKcyBgrSB6E2BBQkH/0WgimIqh8QtSGgIPmgINMg1IaAguSjv8Y6prkTQkFiQkHyIUrvLIj+E70iDycKYkFB8oEviPqMDlEbAgqSkd4ai4LYINSGgIJkxLrQq/+eEAoyAQXJSH+NVei3EAoyAQXJCAWZBKE2BBQkIxRkEoTaEFCQjPQFARhCKMgEFCQneC3EEkTXD4jaEFCQnFCQKRBqQ0BBcuJeY6mE0mDmAeBGOkRtCChITmT1IQwhQhD9EQSiNgQUJCcOQeK3kNkPK1IQBxQkKzmGEAoSEwqSlRxDCAWJCQXJiii/Y5ohhILEhIJkxSFI9BZCQWJCQbJCQSZAqA0BBcmLWX/HNEPIIkGU/YCoDQEFyYsQJM2dEAoSEwqSF4cgsVvIXEEQbqRD1IaAguTFEiT+Gmu2IAAjCERtCChIXq6NCjxenjaJeQgKEhMKkpXrmi6GFEMIBYkJBcmKUxDNJ3opyAQUJCfX16YhR4BH3inIBBQkJ5YgSYaQECjIBBQkJ8OCaBlCQSagIFnpzyDqQwgFmYCCZMUliOoa65IHiPuEELUhoCCZMW6EnGOgIAKE2hBQkNzIDqI9hBiCIKywIGpDQEGyYwmi2UIoyAQUJDtSEOU1FgWZgIJkR1zm1V5jUZAJKEh+HIKotRAKMgEFyY8lSNw11syHFSmIEwqSHylI9CGEgsSEguSnHUJ6gsQyhILEhIIo4BAkYguZJwjGfUKI2hBQEAUsQaKusShITCiIAs0aq40BQxCIFRZEbQgoiAZuQSIZQkFiQkE0sASJ2UIoSEwoiAb1GstY/1OQBoTaEFAQFSjIAAi1IZgjyMtPD4fD+0/FZn/46eHwoHnt1aPDmbc/7+3D95gZgBQkjiEUJCYzBGnq/8Fnxla/rZV48HH1yf0NBZnAEiRiC6EgMQkX5PUnh3eeFi/L/7/oNro7PPj7onrt7MTd4V33PnyPmQF9Qa7Fu/m0HnmnIBOEC3J/c7ag7CMfty+VznxYXF57Un9m78P3mBnQjgFNkFN1o1DfD/XzYhEuyPOmPzy/aPDqUbPeOqvx+hOx+iooiAO3IPkNuTxRXEJBbMIFedJ0jjtzjdX93YeVLm//6qPD4eHFEgpiUa2xhCBKLYSCTBAsSLmcqgW5v7EEqTtJO6NfOgwFsRGC6K2xuvfFN4ZkD8AVDxLBgnTLqWYWMXl+bip3h2qK/9OnzXWuN0uOpE8lyIWyOI/HUhCdWAxBdAJYMwGC3NVKPG/WXk+6i1nsIDbXYj1zXmNpDCHsIBNE7CB3Nw8+Fp93QwoFcSAX/FprLM4gE8SbQZ4fehevLgZREAcUxIX+eekR6yrW69/2/aAg48AJgnCfEOC89IhyH+TcVx5+3n3YN4iCOMAYQroZBONGOsB56RHlTnrx+onRTprhvL29XlAQNxAtpBWkoCBuZj2L9bD/LNZz85P7m8MHL4qXH/FhxXFSCRL8sGLbvQD8QDHUVaoAABNiSURBVDgvkhlP8zY3AuuR49wu2ufbS6rm8fzQe9yXgriw1lhKgpyAGgjCeZEsfT/IWZC7gxCkeFm9OeSDF9Y+fI+ZAYQYEg0hMwQpKMgQfEehHonWWIGCNBP67XmNtfjgS0E4LwIKokeiNVa4IAUFGYSC6HF0rrEW7zZMEKOBlIYsPvhSEM6LgILocbTXWDGGkGBBCgoyDAXRwyFIjBYSJMiJgoxDQfQ4phlCQgUpCs4gw1AQPY7uC71LdxsiyImCTEBB9Dg6LvRGGEICBan+aPTQ9wPivAgoiB7HNBd6AwQ5XQTp35ZRAuG8CCiIHkf7Znrm5xWNBkJB3FAQPRyCxLkT4otoIBTECQXR4+i6mZ7zPSHVj4oouh/IRUFcUBA9qhg011iniyBFPxQtEM6LgILo4RIk5xqrOtrx8hMdKYgLCqKHJUiRVZDTRZDz5xTEBQXRoxFEaQipJ3QKMgEF0eMcg9oQUl/BOl6EpCAuKIgeTkFyrbFOhiD1KxTEBQXRoxXEXmNlOHhzC+SI1UAgzouAguhRx6AzhJwMQQo7DjUQzouAgugxIEiWFtL4YdhIQZxQED06QS6VGWMI8XlY8WQI0rxEQZxQED2aGGIPIZ6CnP+8pSATUBA9RgRZYoiHII4GQkHcUBA9BgRZ2kL8BKk/oCBTUBA9LoJEXWNNC3JyrLAoiBsKokcbg4Yg9QfmgSiIEwqix5ggCwyZFMTZQCiIGwqihyFIzAu9PoLUH1S/Vrd9EcMPiPMioCB6uIszuSCigVCQCSiIHnqC1B9UR6EgE1AQPcziFGusZUPIhCAnChICBdHjEkPUIWRcEOEHBZmEgujhFiTxI++dH/UxKMgEFEQPDUF6DYSCTEFB9BCCyDVWsveE9BoIBZmCguhhxJCrhfQbCAWZgoLooSNI81FzAAoyAQXRQwpiXehNcESrgbgfd1EE4bwIKIgeZgx5hhCrgVCQKSiIHkOCJGshpyFBrmuiHzAchPMioCB6aAjSfHRLQTyhIHr0BEk+hDgaSB3D9TWMIQjnRUBB9BAxZBhCHA2EgkxBQfQYFCRNC3E1EAoyBQXRoy9IpDXW0MOKrgbCGWQKCqKHjMGxxpq32wFBnA2EgkxBQfQYFqRYMoQMC9J+6BZk1sFig3BeBBRED0uQOGsstyAn5wrrMoPMOlR8EM6LgILo0YshqSAndwPpBJl1pAQgnBcBBdFjXJDZQ8iQIO2Ht31BgBoIxHkRUBA9RgRZMoS4BBlqIK0gc46TBITzIqAgetiCRFljDQjSfnjbFwSpgUCcFwEF0aMfQ6SfbeIQZLCBlDFA+QFxXgQURI8JQW5rgnfrFqT98NYhSPAh0oFwXgQURA+HIKYh8QQZbiDFEauBQJwXAQXRw4pBCHJ7O9MQpyDdxw5BQg+QEoTzIqAgeiQSxOI0vMICm0AwzouAgujhEuRSrVEFMffaP+Ti/ccE4bwIKIgedgyuFrL4MGtqIBDnRUBB9PATZLEha2ogEOdFQEH0mBBk/nUswaoaCMR5EVAQPZyCyHuF9vf8YFbVQCDOi4CC6OGIwRZkqSHraiAQ50VAQfTwFmSJIRMNBCEPJmjxUBBF3IJ0hpxiGHIaEeSagkxDQfRwxWD9rqlikSF9P/qCQOTBBC0eCqLIhCCnmmLJGGL64WogEHkwQYuHgigyIEhryEWQ2YZMNhCIPJigxUNBFHHG0AlyOokW4m+I8bDiZAOByIMJWjwURBF/QYIMuQgy3UAg8mCCFg8FUcRTkHOVBxgiBLm87L4HgpAHE7R4KIgiQ4I4DAl5g3onyGlCkMEYFEGLh4Io4o7BLUjATwEyBbm82mtB1xTEjzyCHIk31d27hrLC2z/rJxe9dlAK0n3V5VX51dfGUcgi2EGSMdhB7AekWkPMnjBE20EmGshYDHqgxcMlliIDMQw8QdgaMqlII8jYBHJNQXyhIHqECVKcq/xy5XeQiyDiK50NBCIPJmjxUBBFhgWZNGTMkVoQvwYCkQcTtHgoiCJDMYwK0hkyqEgniPw69wEQ8mCCFg8FUSRckKbSxx05C+LZQCDyYIIWDwVRZIYgXS+Y6iPybwYbCEQeTNDioSCKjAgyakj9wagiVgMxBLmmIAFQED0GYxh9q7hR7IOOnHwbCEQeTNDioSCKzBbEKHe3I5YfQw0EIg8maPFQEEXGBPE2xHhkS7wkv0Du3CcGJdDioSCKDMcw/uN4rEffpSL9hjLWQCDyYIIWDwVRZK4grkffe4/++jYQiDyYoMVDQRQZFSTUkP77RwY27u8ZIQ8maPFQEEVGYpgWxPXmEKch1grLNwYV0OKhIIrMF2T4HbhOQcR+KUgQFESPBYIMGmIJMt5AIPJgghYPBVFkXJBlhpjbje0WIQ8maPFQEEXGYpj+ueuDglxdXQ00EId2CHkwQYuHgiiyTJDBn3Mifsvt+AILIw8maPFQEEUmBPFoIU5DTEGmGghEHkzQ4qEgiozG4NdCXIb0BBnfJUIeTNDioSCKLBVkwJAhQZxNCSEPJmjxUBBFpgTxMsR+0RCkv8IKjEEBtHgoiCLjMXj9/kCXIVIQc38UJBwKokccQSxDLoJMNxCIPJigxUNBFIkgiMsQIYi5OwoyAwqix6Qg8wzpBPFoIBB5MEGLh4IoMhGD5y8xHxXE3BkFmQMF0SOOIJYhQ4LMiSE7aPFQEEWmBfFtIc476ubrg/tCyIMJWjwURJGpGBYa4tNAIPJgghYPBVHEo4PMvpTl2UAg8mCCFg8FUSSaIM77hV4NBCIPJmjxUBBFpi/zLjDEr4FA5MEELR4KokhcQW6tV8xdzYshP2jxUBBFIgpiGeLZQCDyYIIWDwVRxG8GmddDPBsIRB5M0OKhIIp4CzJjDPFsIBB5MEGLh4IoMhnDubJDLvaaH7efjH81Qh5M0OKhIIr4xuBpiLnIkg0kQgy5QIuHgijiHYNnE7kY4t1AIPJgghYPBVEkIIYQQ66urrwbCEQeTNDioSCKhMTg10RsQaa+CiEPJmjxUBBFwmLwUqQy4yyI8VURY0gPWjwURJHAGHwMqRZZpiCTX4GQBxO0eCiIIsExeChiCxI5hsSgxUNBFJkRg48hhiDTLQchDyZo8VAQRebEMNVE2g5y226dIIaUoMWTT5Cry3/HK/m5xn/rjaEs+vK/ob+/vWoE6bbFzwNyPNP/sYMkY2YMo01EdBCPC8MIeTBBi4dLLEVmxzCmiDGD+Nw5QciDCVo8FESRBTEMGyIFSRlDEtDioSCKLIlhpIm0PxfL6+kUhDyYoMVDQRRZFsPkTRGvR4AR8mCCFg8FUWRhDBOG+D0jj5AHE7R4KIgii2MYVcTvXVYIeTBBi4eCKBIhhmFDPN+GiJAHE7R4KIgiMWIYbCKe72RHyIMJWjwURJE4MbgN8f1RDwh5MEGLh4IoEikGVxPx9QMiDyZo8VAQRaLFYCvi6wdEHkzQ4qEgisSLoW+IdwOByIMJWjwURJGYMUhFvP2AyIMJWjwURJG4MRiG+DcQiDyYoMVDQRSJHEPbRPx+RFCaGBaDFg8FUSR6DLUiV1dXFCQaFESP+DFQkOhQED1SxNAKwhkkEhREDwpigxYPBVGEgtigxUNBFEkSA2eQuFAQPSiIDVo8FESRRDG070nXjGE2aPFQEEUoiA1aPLMEefnp4XB4/6nYTLzW34CCOKEgNmjxzBHk1aNDxYPPjK3Ea9YGFMQJBbFBi2eGIK8/ObzztHhZ/v9F4XzN3oCCOKEgNmjxzBDk/ubtz4tzm/i4cL5mb0BBnDAGG7R4Zgjy/PBu8+eHhfM1ewMK4oQx2KDFM0OQJ01juDPWWOI1ewMK4oQx2KDFEy5IOWHU9X9/0wkiXnNsQEGcMAYbtHjCBXn1qLk61Ywa1mv9Dd4sORKyURYLUrCDDMAYbNDiydBBCgoyAGOwQYuHM4gijMEGLR5exVKEMdigxcP7IIowBhu0eHgnXRHGYIMWz7xnsR46nsV6aD6L9ZDPYnnAGGzQ4pnzNO/9jfGw7pN6PSVeE5+Y+/A9ZgY2HAMfVozJ0veDNILw/SAzoCA2aPHwHYWKUBAbtHgoiCIUxAYtHgqiCAWxQYuHgihCQWzQ4qEgilAQG7R4KIgiFMQGLR4KoggFsUGLh4IoQkFs0OKhIIpQEBu0eCiIIhTEBi2eTIIQslkiCALIm9Ob7ALmYQLvBFGQTcI8TEBB9g3zMMFeBSEkLhSEkBEoCCEjUBBCRqAghIywYkEmf6diUf2Qondzh5WdyTz84aPD4cF/f+H40n3gSlBh1sbABmfWK8jk71SsaH/4xIaZzMPz88eHh58P7GDruBJU0dXG0AZnVivI5O9UrD5/cti8IJN5uL958PflN8lHm8/EAK4EFWZtDGzQsFpBJn8SZFkU5dJi82UxmYcn9Y+KNX5q/75wJUjUhnuDltUKMvmzhIu7w+GD329ekOk81Lx6tFNBXMkQteHcoGO1gkz+NPri7uE/lh9tXZDpPBTWx7vClQxRG84NOtYqyOTvM6lf2rwgnnkofn/jXEBsH1cyapraGN7gzFoFmfyNWPVLmxfELw/lQPrgf2uEp48rQTVNbQxvcIaCrBuvPLz+9L/dHKprWTuEglCQ8wfjeSiKP+x0jbVXQTiD1PjOINVFml1O6XudQTyv3mxeEO+rWLu9ETJ4kWrbV7E8r/9vX5CpPBjfIPcpyOBtjrtt3wfxuJNe7EEQjzvp7TfKrafCzeCN8rY2NnonffJ3Kp7ZviCTebi/OXzwonj924GH8TaPK0Fn2toY3ODMagWZ/p2KFdsXZDoPv6+f5t3pZV53giq62rCqxmS9gkz/TsViF4J4/G7Jn5Znf+DtDnvAlaDCrI1tvh+EkAxQEEJGoCCEjEBBCBmBghAyAgUhZAQKQsgIFISQESgIISNQkBl8+fPvX11d/cXf/nruDp5dfec3s7Z8fNXygx/6Hf3x1V/+bv5fEwoSzLc/66r0R01xffHvw6osgiAlP/Q56JABTcgUZAIKEorhx1VTXcFVFkcQr6MOxPZ4buh7g4KE8uzq6o3/+lX5wR//5XtXV+9VL+UUpPn02y9/XhryV0FHNaEYnlCQQMoG8p1fNx//v+/VZaYgSFGb+sugw4odURAvKEggf/5r4/t2U686glTrrdkthIJ4QkECKTtIryqf1QPBW9XHX/78e9UVpp+ci6906a1v/+X7V1d/8ZO2GP/tP5ff9n/0u67sxfblrt/7tx+Xm//SsWWNEKTcf/PZN9Vu3qiva11WYT+rJOhMMA91Cbn7a3MXrsj3CgUJpSyu//S73gtNtX37T+34/N2qRssy+48/Nj7v5vvv/Lwu4t725V//zfmvf2Nt2SIEKTeq11jPuqtq5SdfN4NRtQC8GCAPZQvS7uKNvytcke8XChJKWTxXV//hf31lvGRUWXXh95sf12ufass3/u53xTc/a/rL4/Pfn2v1XOe97Ssryor/5hf2lpcjmZ8+q10o/6i+8//xn86GdGvAZ2d9mth6h+pfxSr/+rv/WnaZH9d7tCLfLxQkmPa7+w9+0krSVFlXmuUH1QtVmb3XfEX1ef0tvTiXY1Xn/e2rHZ+3t7bscAlSbvxX7eeGEs1BH7ehiEP1BGlfPV+C+I0d+Y6hIDOol/PV+uPX58+bavu6vap0KbOmuuq67qq7GR762zd/FPaWHZYgb5lzfD0fNbstvXmvi61/qJ4gz7rrYbWa/ch3DAWZx7f/9x+qx03qurIuCT2WHaKuYWO875fd41aQ7vv4wJaODmJeNTgHUh72vaLzph/bY5cgl93WMfci3zMUZD7f/vOVXYR//PL/VOo0gjQL+HOZGReIjbIztu9K3b1lUfQFeVwJcp6JOupOZdS4EZtxKCmIsZCqP+xFvmcoyBKaKbkrwi++bxaqLchbhfG5tb0pSH/LBsdVLFuQr6v/f93rbvJQliBWE6IgNRQkkP6diLcKcyyuZve/+Z9fPfbqIP3tQztIfSNf3Llsvrx0Q66h+odiB/GFggTyrL3SVNFcbZKXUgtjBjHLzJos+tt3G3jOIPWddMeFpsdXb3XHbqdweajpGYSC1FCQQEonvvPr9pPH5hLrUqnNtad+mXXFVl9Ksra/eNHb8oIpyBfNNYLH3SWodo9fX/3lF+2LvRbRXhbrX8Vqrf/6qrmKRUFqKEgo1RPnP/zX8oNvq8dCjJsKlyp85pxBLjcsnl1JQZ71ZpD+lubBW3OqR1HqjdpHJi830f/819/5L+2ueoI8c80grvsgFKSGgoQihuL2UY83fvntV+06prodff4Lq8zqW97d/fH+9sbKqrdlh/P9INVt8F/UF9W6uxddSxBLrO5QbciOO+lvFRTEgIIEY7xj6rv1Mubrq/N38z83jy9d/fCfz/Vpl1nzQNR3/0f9fbq3vXkxSW7ZIQRp3894eRarHUa+vnjVtIjeodqQh5/FoiA1FGQG3/zDD6pa+ne/aF/44ntltZUrmeoB2DfK9dfgqPuleEa3t714UPjLgad5Wy4PulQBnd8kf4nHuE7cXmGTh+pC7j3N+6Ovel9PQbQDIAQZCkLICBSEkBEoCCEjUBBCRqAghIxAQQgZgYIQMgIFIWQECkLICBSEkBEoCCEjUBBCRvj/2PJuwrPvODcAAAAASUVORK5CYII=" width="800" /></p>
+<p>The large model is created in much the same manner, only using <span class="math inline">\(16\)</span> total cells and their
+interactions.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>cells <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;c&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">16</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>cells_interactions <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="fu">t</span>(<span class="fu">combn</span>(cells, <span class="dv">2</span>))),</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="st">&quot;X1&quot;</span> <span class="ot">=</span> cells, <span class="st">&quot;X2&quot;</span> <span class="ot">=</span> cells)</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>)</span></code></pre></div>
+<p>Followed by data generation for <span class="math inline">\(100\)</span> trials per scenario:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>info <span class="ot">&lt;-</span> rfdata <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="cf">for</span> (c <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(changes)) {</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">- Change: &quot;</span>, changes[c], <span class="st">&quot;</span><span class="sc">\n</span><span class="st">-- (&quot;</span>, nSims, <span class="st">&quot;): &quot;</span>))</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="fu">set.seed</span>(c <span class="sc">*</span> <span class="dv">1234</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nSims) {</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">paste0</span>(i, <span class="st">&quot;, &quot;</span>))</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>    <span class="co"># Generate</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>    dat <span class="ot">&lt;-</span> <span class="fu">simulatePP</span>(</span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>      <span class="at">agentVarData =</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>        <span class="fu">data.frame</span>(</span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>          <span class="st">&quot;outcome&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>          <span class="st">&quot;c1&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>          <span class="st">&quot;c2&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(baseline, changes[c])<span class="sc">^</span><span class="dv">2</span>, <span class="st">&quot;c3&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">50</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">50</span>),</span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>          <span class="st">&quot;c4&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="st">&quot;c5&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="st">&quot;c6&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a>          <span class="st">&quot;c7&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="st">&quot;c8&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="st">&quot;c9&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a>          <span class="st">&quot;c10&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="st">&quot;c11&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="st">&quot;c12&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">30</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">30</span>)<span class="sc">^</span><span class="dv">2</span>,</span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a>          <span class="st">&quot;c13&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="st">&quot;c14&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">50</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">50</span>)<span class="sc">^</span><span class="dv">2</span>,</span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a>          <span class="st">&quot;c15&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">100</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">100</span>)<span class="sc">^</span><span class="dv">2</span>, <span class="st">&quot;c16&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">10</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">10</span>)</span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a>        ),</span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a>      <span class="at">agentKappaData =</span> <span class="fu">data.frame</span>(</span>
+<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a>        <span class="st">&quot;agent&quot;</span> <span class="ot">=</span> <span class="fu">paste0</span>(<span class="st">&quot;c&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">16</span>),</span>
+<span id="cb10-25"><a href="#cb10-25" tabindex="-1"></a>        <span class="st">&quot;clusterAgent&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="st">&quot;c1&quot;</span>, <span class="st">&quot;c1&quot;</span>, <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">10</span>), <span class="fu">rep</span>(<span class="st">&quot;c1&quot;</span>, <span class="dv">3</span>)),</span>
+<span id="cb10-26"><a href="#cb10-26" tabindex="-1"></a>        <span class="st">&quot;kappa&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">30</span>, <span class="dv">5</span>, <span class="dv">5</span>, <span class="fu">rep</span>(<span class="dv">30</span>, <span class="dv">10</span>), <span class="fu">rep</span>(<span class="dv">5</span>, <span class="dv">3</span>))</span>
+<span id="cb10-27"><a href="#cb10-27" tabindex="-1"></a>      ),</span>
+<span id="cb10-28"><a href="#cb10-28" tabindex="-1"></a>      <span class="at">unitsPerOutcome =</span> <span class="dv">17</span>,</span>
+<span id="cb10-29"><a href="#cb10-29" tabindex="-1"></a>      <span class="at">replicatesPerUnit =</span> <span class="dv">1</span>,</span>
+<span id="cb10-30"><a href="#cb10-30" tabindex="-1"></a>      <span class="at">silent =</span> T</span>
+<span id="cb10-31"><a href="#cb10-31" tabindex="-1"></a>    )</span>
+<span id="cb10-32"><a href="#cb10-32" tabindex="-1"></a>    pcaData <span class="ot">&lt;-</span> <span class="fu">getKsPCAData</span>(</span>
+<span id="cb10-33"><a href="#cb10-33" tabindex="-1"></a>      <span class="at">data =</span> dat, <span class="at">replicate =</span> <span class="st">&quot;replicate&quot;</span>,</span>
+<span id="cb10-34"><a href="#cb10-34" tabindex="-1"></a>      <span class="at">xRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">yRange =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb10-35"><a href="#cb10-35" tabindex="-1"></a>      <span class="at">agents_df =</span> cells_interactions,</span>
+<span id="cb10-36"><a href="#cb10-36" tabindex="-1"></a>      <span class="at">silent =</span> <span class="cn">TRUE</span></span>
+<span id="cb10-37"><a href="#cb10-37" tabindex="-1"></a>    )</span>
+<span id="cb10-38"><a href="#cb10-38" tabindex="-1"></a>    pcaMeta <span class="ot">&lt;-</span> <span class="fu">simulateMeta</span>(pcaData,</span>
+<span id="cb10-39"><a href="#cb10-39" tabindex="-1"></a>      <span class="at">metaInfo =</span> <span class="fu">data.frame</span>(</span>
+<span id="cb10-40"><a href="#cb10-40" tabindex="-1"></a>        <span class="st">&quot;var&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>),</span>
+<span id="cb10-41"><a href="#cb10-41" tabindex="-1"></a>        <span class="st">&quot;rdist&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;rnorm&quot;</span>),</span>
+<span id="cb10-42"><a href="#cb10-42" tabindex="-1"></a>        <span class="st">&quot;outcome_0&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;25&quot;</span>),</span>
+<span id="cb10-43"><a href="#cb10-43" tabindex="-1"></a>        <span class="st">&quot;outcome_1&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;25&quot;</span>)</span>
+<span id="cb10-44"><a href="#cb10-44" tabindex="-1"></a>      )</span>
+<span id="cb10-45"><a href="#cb10-45" tabindex="-1"></a>    )</span>
+<span id="cb10-46"><a href="#cb10-46" tabindex="-1"></a>    info[[i]] <span class="ot">&lt;-</span> <span class="fu">list</span>(dat, pcaData, pcaMeta)</span>
+<span id="cb10-47"><a href="#cb10-47" tabindex="-1"></a>    rfdata[[i]] <span class="ot">&lt;-</span> pcaMeta</span>
+<span id="cb10-48"><a href="#cb10-48" tabindex="-1"></a>  }</span>
+<span id="cb10-49"><a href="#cb10-49" tabindex="-1"></a></span>
+<span id="cb10-50"><a href="#cb10-50" tabindex="-1"></a>  <span class="do">## Save RDS</span></span>
+<span id="cb10-51"><a href="#cb10-51" tabindex="-1"></a>  <span class="fu">saveRDS</span>(info, <span class="fu">paste0</span>(path, <span class="st">&quot;change_sim_large_info&quot;</span>, c, <span class="st">&quot;.rds&quot;</span>))</span>
+<span id="cb10-52"><a href="#cb10-52" tabindex="-1"></a>  <span class="fu">saveRDS</span>(rfdata, <span class="fu">paste0</span>(path, <span class="st">&quot;change_sim_large_rfdata&quot;</span>, c, <span class="st">&quot;.rds&quot;</span>))</span>
+<span id="cb10-53"><a href="#cb10-53" tabindex="-1"></a>}</span></code></pre></div>
+<p>Then model fitting:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>loop <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span>nSims <span class="co"># Often in sets of 10,</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="cf">for</span> (c <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(changes)) {</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">- Change: &quot;</span>, changes[c], <span class="st">&quot;</span><span class="sc">\n</span><span class="st">-- (&quot;</span>, nSims, <span class="st">&quot;): &quot;</span>))</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  rfdat <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">paste0</span>(path, <span class="st">&quot;change_sim_large_rfdata&quot;</span>, c, <span class="st">&quot;.rds&quot;</span>))</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>  VarVI_both <span class="ot">&lt;-</span> VarVI_noi <span class="ot">&lt;-</span> VarVI_int <span class="ot">&lt;-</span></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>    VarVI_maxint <span class="ot">&lt;-</span> VarVI_bothmax <span class="ot">&lt;-</span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="st">&quot;var&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>      <span class="st">&quot;age&quot;</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a>      <span class="fu">paste</span>(cells_interactions<span class="sc">$</span>X1,</span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a>        cells_interactions<span class="sc">$</span>X2,</span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a>        <span class="at">sep =</span> <span class="st">&quot;_&quot;</span></span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a>      )</span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a>    ))</span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> loop) {</span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">paste0</span>(i <span class="sc">-</span> <span class="fu">min</span>(loop) <span class="sc">+</span> <span class="dv">1</span>, <span class="st">&quot;, &quot;</span>))</span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a>    <span class="co"># Generate</span></span>
+<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a></span>
+<span id="cb11-22"><a href="#cb11-22" tabindex="-1"></a>    <span class="co"># Move into loop so this loop can be split to allow additional computation</span></span>
+<span id="cb11-23"><a href="#cb11-23" tabindex="-1"></a>    <span class="fu">set.seed</span>(c <span class="sc">*</span> <span class="dv">12345</span> <span class="sc">+</span> i)</span>
+<span id="cb11-24"><a href="#cb11-24" tabindex="-1"></a></span>
+<span id="cb11-25"><a href="#cb11-25" tabindex="-1"></a>    rfcv <span class="ot">&lt;-</span> <span class="fu">funkyModel</span>(</span>
+<span id="cb11-26"><a href="#cb11-26" tabindex="-1"></a>      <span class="at">data =</span> rfdat[[i]],</span>
+<span id="cb11-27"><a href="#cb11-27" tabindex="-1"></a>      <span class="at">outcome =</span> <span class="st">&quot;outcome&quot;</span>, <span class="at">unit =</span> <span class="st">&quot;unit&quot;</span>,</span>
+<span id="cb11-28"><a href="#cb11-28" tabindex="-1"></a>      <span class="at">metaNames =</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>), <span class="at">silent =</span> <span class="cn">TRUE</span></span>
+<span id="cb11-29"><a href="#cb11-29" tabindex="-1"></a>    )</span>
+<span id="cb11-30"><a href="#cb11-30" tabindex="-1"></a></span>
+<span id="cb11-31"><a href="#cb11-31" tabindex="-1"></a>    <span class="co"># Org Data</span></span>
+<span id="cb11-32"><a href="#cb11-32" tabindex="-1"></a>    tmp <span class="ot">&lt;-</span> rfcv<span class="sc">$</span>VariableImportance[, <span class="fu">c</span>(<span class="st">&quot;var&quot;</span>, <span class="st">&quot;est&quot;</span>, <span class="st">&quot;sd&quot;</span>)]</span>
+<span id="cb11-33"><a href="#cb11-33" tabindex="-1"></a>    tmp <span class="ot">&lt;-</span> tmp[<span class="fu">order</span>(<span class="sc">-</span>tmp<span class="sc">$</span>est), ]</span>
+<span id="cb11-34"><a href="#cb11-34" tabindex="-1"></a>    <span class="fu">rownames</span>(tmp) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb11-35"><a href="#cb11-35" tabindex="-1"></a>    tmp<span class="sc">$</span>CutoffNoise <span class="ot">&lt;-</span> rfcv<span class="sc">$</span>NoiseCutoff</span>
+<span id="cb11-36"><a href="#cb11-36" tabindex="-1"></a>    tmp<span class="sc">$</span>CutoffInterp <span class="ot">&lt;-</span> rfcv<span class="sc">$</span>InterpolationCutoff</span>
+<span id="cb11-37"><a href="#cb11-37" tabindex="-1"></a>    tmp<span class="sc">$</span>CutoffMaxInterp <span class="ot">&lt;-</span> <span class="fu">max</span>(rfcv<span class="sc">$</span>InterpolationCutoff)</span>
+<span id="cb11-38"><a href="#cb11-38" tabindex="-1"></a></span>
+<span id="cb11-39"><a href="#cb11-39" tabindex="-1"></a>    <span class="co"># Above Lines</span></span>
+<span id="cb11-40"><a href="#cb11-40" tabindex="-1"></a>    tmp<span class="sc">$</span>TF_intCO <span class="ot">&lt;-</span> (tmp<span class="sc">$</span>est <span class="sc">&gt;</span> tmp<span class="sc">$</span>CutoffInterp)</span>
+<span id="cb11-41"><a href="#cb11-41" tabindex="-1"></a>    tmp<span class="sc">$</span>TF_noiCO <span class="ot">&lt;-</span> (tmp<span class="sc">$</span>est <span class="sc">&gt;</span> tmp<span class="sc">$</span>CutoffNoise)</span>
+<span id="cb11-42"><a href="#cb11-42" tabindex="-1"></a>    tmp[[<span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i)]] <span class="ot">&lt;-</span> tmp<span class="sc">$</span>TF_intCO <span class="sc">*</span> tmp<span class="sc">$</span>TF_noiCO</span>
+<span id="cb11-43"><a href="#cb11-43" tabindex="-1"></a>    VarVI_both <span class="ot">&lt;-</span> <span class="fu">merge</span>(VarVI_both, tmp[, <span class="fu">c</span>(<span class="st">&quot;var&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i))])</span>
+<span id="cb11-44"><a href="#cb11-44" tabindex="-1"></a>    tmp[[<span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i)]] <span class="ot">&lt;-</span> tmp<span class="sc">$</span>TF_noiCO</span>
+<span id="cb11-45"><a href="#cb11-45" tabindex="-1"></a>    VarVI_noi <span class="ot">&lt;-</span> <span class="fu">merge</span>(VarVI_noi, tmp[, <span class="fu">c</span>(<span class="st">&quot;var&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i))])</span>
+<span id="cb11-46"><a href="#cb11-46" tabindex="-1"></a>    tmp[[<span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i)]] <span class="ot">&lt;-</span> tmp<span class="sc">$</span>TF_intCO</span>
+<span id="cb11-47"><a href="#cb11-47" tabindex="-1"></a>    VarVI_int <span class="ot">&lt;-</span> <span class="fu">merge</span>(VarVI_int, tmp[, <span class="fu">c</span>(<span class="st">&quot;var&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i))])</span>
+<span id="cb11-48"><a href="#cb11-48" tabindex="-1"></a></span>
+<span id="cb11-49"><a href="#cb11-49" tabindex="-1"></a>    tmp<span class="sc">$</span>TF_maxIntCO <span class="ot">&lt;-</span> (tmp<span class="sc">$</span>est <span class="sc">&gt;</span> tmp<span class="sc">$</span>CutoffMaxInterp)</span>
+<span id="cb11-50"><a href="#cb11-50" tabindex="-1"></a>    tmp[[<span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i)]] <span class="ot">&lt;-</span> tmp<span class="sc">$</span>TF_maxIntCO <span class="sc">*</span> tmp<span class="sc">$</span>TF_noiCO</span>
+<span id="cb11-51"><a href="#cb11-51" tabindex="-1"></a>    VarVI_bothmax <span class="ot">&lt;-</span> <span class="fu">merge</span>(VarVI_bothmax, tmp[, <span class="fu">c</span>(<span class="st">&quot;var&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i))])</span>
+<span id="cb11-52"><a href="#cb11-52" tabindex="-1"></a>    tmp[[<span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i)]] <span class="ot">&lt;-</span> tmp<span class="sc">$</span>TF_maxIntCO</span>
+<span id="cb11-53"><a href="#cb11-53" tabindex="-1"></a>    VarVI_maxint <span class="ot">&lt;-</span> <span class="fu">merge</span>(VarVI_maxint, tmp[, <span class="fu">c</span>(<span class="st">&quot;var&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;iter&quot;</span>, i))])</span>
+<span id="cb11-54"><a href="#cb11-54" tabindex="-1"></a>  }</span>
+<span id="cb11-55"><a href="#cb11-55" tabindex="-1"></a></span>
+<span id="cb11-56"><a href="#cb11-56" tabindex="-1"></a>  <span class="do">## Save RDS</span></span>
+<span id="cb11-57"><a href="#cb11-57" tabindex="-1"></a></span>
+<span id="cb11-58"><a href="#cb11-58" tabindex="-1"></a>  results[[<span class="fu">paste0</span>(<span class="st">&quot;Change_&quot;</span>, changes[c])]] <span class="ot">&lt;-</span></span>
+<span id="cb11-59"><a href="#cb11-59" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb11-60"><a href="#cb11-60" tabindex="-1"></a>      <span class="st">&quot;dat&quot;</span> <span class="ot">=</span> tmp, <span class="st">&quot;fullDat&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb11-61"><a href="#cb11-61" tabindex="-1"></a>        rfcv<span class="sc">$</span>VariableImportance,</span>
+<span id="cb11-62"><a href="#cb11-62" tabindex="-1"></a>        rfcv<span class="sc">$</span>NoiseCutoff,</span>
+<span id="cb11-63"><a href="#cb11-63" tabindex="-1"></a>        rfcv<span class="sc">$</span>InterpolationCutoff</span>
+<span id="cb11-64"><a href="#cb11-64" tabindex="-1"></a>      ),</span>
+<span id="cb11-65"><a href="#cb11-65" tabindex="-1"></a>      <span class="st">&quot;VarVI_both&quot;</span> <span class="ot">=</span> VarVI_both,</span>
+<span id="cb11-66"><a href="#cb11-66" tabindex="-1"></a>      <span class="st">&quot;VarVI_noi&quot;</span> <span class="ot">=</span> VarVI_noi,</span>
+<span id="cb11-67"><a href="#cb11-67" tabindex="-1"></a>      <span class="st">&quot;VarVI_int&quot;</span> <span class="ot">=</span> VarVI_int,</span>
+<span id="cb11-68"><a href="#cb11-68" tabindex="-1"></a>      <span class="st">&quot;VarVI_bothmax&quot;</span> <span class="ot">=</span> VarVI_bothmax,</span>
+<span id="cb11-69"><a href="#cb11-69" tabindex="-1"></a>      <span class="st">&quot;VarVI_maxint&quot;</span> <span class="ot">=</span> VarVI_maxint</span>
+<span id="cb11-70"><a href="#cb11-70" tabindex="-1"></a>    )</span>
+<span id="cb11-71"><a href="#cb11-71" tabindex="-1"></a></span>
+<span id="cb11-72"><a href="#cb11-72" tabindex="-1"></a>  <span class="do">## Save RDS</span></span>
+<span id="cb11-73"><a href="#cb11-73" tabindex="-1"></a>  <span class="co">#   Min/Max loop due to our running of splitting the inner loop to</span></span>
+<span id="cb11-74"><a href="#cb11-74" tabindex="-1"></a>  <span class="co">#     run multiple instances at once.</span></span>
+<span id="cb11-75"><a href="#cb11-75" tabindex="-1"></a>  <span class="fu">saveRDS</span>(results, <span class="fu">paste0</span>(</span>
+<span id="cb11-76"><a href="#cb11-76" tabindex="-1"></a>    path, <span class="st">&quot;change_sim_large_&quot;</span>, c, <span class="st">&quot;_&quot;</span>,</span>
+<span id="cb11-77"><a href="#cb11-77" tabindex="-1"></a>    <span class="fu">min</span>(loop), <span class="fu">max</span>(loop), <span class="st">&quot;_&quot;</span>, <span class="st">&quot;.rds&quot;</span></span>
+<span id="cb11-78"><a href="#cb11-78" tabindex="-1"></a>  ))</span>
+<span id="cb11-79"><a href="#cb11-79" tabindex="-1"></a>}</span></code></pre></div>
+<p>And data summarizing:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co"># Breaks come</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>breaks <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;1100&quot;</span>) <span class="co"># This will change based on previous loop and saving</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">11</span>) {</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>  tmpData <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(breaks)) {</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>    iterData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>      <span class="fu">paste0</span>(</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>        path, <span class="st">&quot;change_sim_large_&quot;</span>,</span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>        i, <span class="st">&quot;_&quot;</span>, breaks[j], <span class="st">&quot;_&quot;</span>, <span class="st">&quot;.rds&quot;</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>      )</span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>    )</span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>    <span class="co"># Next part may be needed depending on break scheme to recombine</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>    <span class="cf">if</span> (j <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>      tmpData[[<span class="fu">names</span>(iterData)]] <span class="ot">&lt;-</span></span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a>        <span class="fu">list</span>(</span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a>          <span class="at">dat =</span> iterData[[<span class="dv">1</span>]]<span class="sc">$</span>dat[, <span class="sc">-</span><span class="dv">9</span>],</span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a>          <span class="at">VarVI_both =</span> iterData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_both,</span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a>          <span class="at">VarVI_noi =</span> iterData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_noi,</span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a>          <span class="at">VarVI_int =</span> iterData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_int,</span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a>          <span class="at">VarVI_bothmax =</span> iterData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_bothmax,</span>
+<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a>          <span class="at">VarVI_maxint =</span> iterData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_maxint,</span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a>          <span class="at">VarVI_both =</span> iterData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_both</span>
+<span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a>        )</span>
+<span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb12-26"><a href="#cb12-26" tabindex="-1"></a>      tmpData[[<span class="fu">names</span>(iterData)]] <span class="ot">&lt;-</span></span>
+<span id="cb12-27"><a href="#cb12-27" tabindex="-1"></a>        <span class="fu">list</span>(</span>
+<span id="cb12-28"><a href="#cb12-28" tabindex="-1"></a>          <span class="at">dat =</span> <span class="fu">rbind</span>(</span>
+<span id="cb12-29"><a href="#cb12-29" tabindex="-1"></a>            tmpData[[<span class="dv">1</span>]]<span class="sc">$</span>dat,</span>
+<span id="cb12-30"><a href="#cb12-30" tabindex="-1"></a>            iterData[[<span class="dv">1</span>]]<span class="sc">$</span>dat[, <span class="sc">-</span><span class="dv">9</span>]</span>
+<span id="cb12-31"><a href="#cb12-31" tabindex="-1"></a>          ),</span>
+<span id="cb12-32"><a href="#cb12-32" tabindex="-1"></a>          <span class="at">VarVI_both =</span> <span class="fu">merge</span>(</span>
+<span id="cb12-33"><a href="#cb12-33" tabindex="-1"></a>            tmpData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_both,</span>
+<span id="cb12-34"><a href="#cb12-34" tabindex="-1"></a>            iterData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_both</span>
+<span id="cb12-35"><a href="#cb12-35" tabindex="-1"></a>          ),</span>
+<span id="cb12-36"><a href="#cb12-36" tabindex="-1"></a>          <span class="at">VarVI_noi =</span> <span class="fu">merge</span>(</span>
+<span id="cb12-37"><a href="#cb12-37" tabindex="-1"></a>            tmpData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_noi,</span>
+<span id="cb12-38"><a href="#cb12-38" tabindex="-1"></a>            iterData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_noi</span>
+<span id="cb12-39"><a href="#cb12-39" tabindex="-1"></a>          ),</span>
+<span id="cb12-40"><a href="#cb12-40" tabindex="-1"></a>          <span class="at">VarVI_int =</span> <span class="fu">merge</span>(</span>
+<span id="cb12-41"><a href="#cb12-41" tabindex="-1"></a>            tmpData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_int,</span>
+<span id="cb12-42"><a href="#cb12-42" tabindex="-1"></a>            iterData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_int</span>
+<span id="cb12-43"><a href="#cb12-43" tabindex="-1"></a>          ),</span>
+<span id="cb12-44"><a href="#cb12-44" tabindex="-1"></a>          <span class="at">VarVI_bothmax =</span> <span class="fu">merge</span>(</span>
+<span id="cb12-45"><a href="#cb12-45" tabindex="-1"></a>            tmpData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_bothmax,</span>
+<span id="cb12-46"><a href="#cb12-46" tabindex="-1"></a>            iterData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_bothmax</span>
+<span id="cb12-47"><a href="#cb12-47" tabindex="-1"></a>          ),</span>
+<span id="cb12-48"><a href="#cb12-48" tabindex="-1"></a>          <span class="at">VarVI_maxint =</span> <span class="fu">merge</span>(</span>
+<span id="cb12-49"><a href="#cb12-49" tabindex="-1"></a>            tmpData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_maxint,</span>
+<span id="cb12-50"><a href="#cb12-50" tabindex="-1"></a>            iterData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_maxint</span>
+<span id="cb12-51"><a href="#cb12-51" tabindex="-1"></a>          ),</span>
+<span id="cb12-52"><a href="#cb12-52" tabindex="-1"></a>          <span class="at">VarVI_both =</span> <span class="fu">merge</span>(</span>
+<span id="cb12-53"><a href="#cb12-53" tabindex="-1"></a>            tmpData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_both,</span>
+<span id="cb12-54"><a href="#cb12-54" tabindex="-1"></a>            iterData[[<span class="dv">1</span>]]<span class="sc">$</span>VarVI_both</span>
+<span id="cb12-55"><a href="#cb12-55" tabindex="-1"></a>          )</span>
+<span id="cb12-56"><a href="#cb12-56" tabindex="-1"></a>        )</span>
+<span id="cb12-57"><a href="#cb12-57" tabindex="-1"></a>    }</span>
+<span id="cb12-58"><a href="#cb12-58" tabindex="-1"></a>  }</span>
+<span id="cb12-59"><a href="#cb12-59" tabindex="-1"></a></span>
+<span id="cb12-60"><a href="#cb12-60" tabindex="-1"></a>  data <span class="ot">&lt;-</span> <span class="fu">append</span>(data, tmpData)</span>
+<span id="cb12-61"><a href="#cb12-61" tabindex="-1"></a>}</span>
+<span id="cb12-62"><a href="#cb12-62" tabindex="-1"></a></span>
+<span id="cb12-63"><a href="#cb12-63" tabindex="-1"></a>data_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb12-64"><a href="#cb12-64" tabindex="-1"></a>  <span class="st">&quot;var&quot;</span> <span class="ot">=</span> changes, <span class="st">&quot;noi&quot;</span> <span class="ot">=</span> <span class="cn">NA</span>, <span class="st">&quot;int&quot;</span> <span class="ot">=</span> <span class="cn">NA</span>,</span>
+<span id="cb12-65"><a href="#cb12-65" tabindex="-1"></a>  <span class="st">&quot;both&quot;</span> <span class="ot">=</span> <span class="cn">NA</span>, <span class="st">&quot;max&quot;</span> <span class="ot">=</span> <span class="cn">NA</span>, <span class="st">&quot;bothmax&quot;</span> <span class="ot">=</span> <span class="cn">NA</span></span>
+<span id="cb12-66"><a href="#cb12-66" tabindex="-1"></a>)</span>
+<span id="cb12-67"><a href="#cb12-67" tabindex="-1"></a></span>
+<span id="cb12-68"><a href="#cb12-68" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(data)) {</span>
+<span id="cb12-69"><a href="#cb12-69" tabindex="-1"></a>  data_summary[i, <span class="st">&quot;noi&quot;</span>] <span class="ot">&lt;-</span></span>
+<span id="cb12-70"><a href="#cb12-70" tabindex="-1"></a>    <span class="fu">sum</span>(data[[i]]<span class="sc">$</span>VarVI_noi[data[[i]]<span class="sc">$</span>VarVI_noi<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>]) <span class="sc">/</span></span>
+<span id="cb12-71"><a href="#cb12-71" tabindex="-1"></a>      <span class="fu">length</span>(data[[i]]<span class="sc">$</span>VarVI_noi[data[[i]]<span class="sc">$</span>VarVI_noi<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb12-72"><a href="#cb12-72" tabindex="-1"></a></span>
+<span id="cb12-73"><a href="#cb12-73" tabindex="-1"></a>  data_summary[i, <span class="st">&quot;int&quot;</span>] <span class="ot">&lt;-</span></span>
+<span id="cb12-74"><a href="#cb12-74" tabindex="-1"></a>    <span class="fu">sum</span>(data[[i]]<span class="sc">$</span>VarVI_int[data[[i]]<span class="sc">$</span>VarVI_int<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>]) <span class="sc">/</span></span>
+<span id="cb12-75"><a href="#cb12-75" tabindex="-1"></a>      <span class="fu">length</span>(data[[i]]<span class="sc">$</span>VarVI_int[data[[i]]<span class="sc">$</span>VarVI_int<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb12-76"><a href="#cb12-76" tabindex="-1"></a></span>
+<span id="cb12-77"><a href="#cb12-77" tabindex="-1"></a>  data_summary[i, <span class="st">&quot;max&quot;</span>] <span class="ot">&lt;-</span></span>
+<span id="cb12-78"><a href="#cb12-78" tabindex="-1"></a>    <span class="fu">sum</span>(data[[i]]<span class="sc">$</span>VarVI_max[data[[i]]<span class="sc">$</span>VarVI_max<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>]) <span class="sc">/</span></span>
+<span id="cb12-79"><a href="#cb12-79" tabindex="-1"></a>      <span class="fu">length</span>(data[[i]]<span class="sc">$</span>VarVI_max[data[[i]]<span class="sc">$</span>VarVI_max<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb12-80"><a href="#cb12-80" tabindex="-1"></a></span>
+<span id="cb12-81"><a href="#cb12-81" tabindex="-1"></a>  data_summary[i, <span class="st">&quot;both&quot;</span>] <span class="ot">&lt;-</span></span>
+<span id="cb12-82"><a href="#cb12-82" tabindex="-1"></a>    <span class="fu">sum</span>(data[[i]]<span class="sc">$</span>VarVI_both[data[[i]]<span class="sc">$</span>VarVI_both<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>]) <span class="sc">/</span></span>
+<span id="cb12-83"><a href="#cb12-83" tabindex="-1"></a>      <span class="fu">length</span>(data[[i]]<span class="sc">$</span>VarVI_both[data[[i]]<span class="sc">$</span>VarVI_both<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb12-84"><a href="#cb12-84" tabindex="-1"></a></span>
+<span id="cb12-85"><a href="#cb12-85" tabindex="-1"></a>  <span class="co"># (max either)</span></span>
+<span id="cb12-86"><a href="#cb12-86" tabindex="-1"></a>  data_summary[i, <span class="st">&quot;bothmax&quot;</span>] <span class="ot">&lt;-</span></span>
+<span id="cb12-87"><a href="#cb12-87" tabindex="-1"></a>    <span class="fu">sum</span>(data[[i]]<span class="sc">$</span>VarVI_bothmax[data[[i]]<span class="sc">$</span>VarVI_bothmax<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>]) <span class="sc">/</span></span>
+<span id="cb12-88"><a href="#cb12-88" tabindex="-1"></a>      <span class="fu">length</span>(data[[i]]<span class="sc">$</span>VarVI_bothmax[data[[i]]<span class="sc">$</span>VarVI_bothmax<span class="sc">$</span>var <span class="sc">==</span> <span class="st">&quot;c1_c2&quot;</span>, <span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb12-89"><a href="#cb12-89" tabindex="-1"></a>}</span>
+<span id="cb12-90"><a href="#cb12-90" tabindex="-1"></a></span>
+<span id="cb12-91"><a href="#cb12-91" tabindex="-1"></a></span>
+<span id="cb12-92"><a href="#cb12-92" tabindex="-1"></a>data_plot <span class="ot">&lt;-</span> tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(data_summary, <span class="at">cols =</span> noi<span class="sc">:</span>bothmax)</span></code></pre></div>
+<p>With a resulting power curve:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>plot_lg <span class="ot">&lt;-</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">ggplot</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>    data_plot[data_plot<span class="sc">$</span>name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;noi&quot;</span>, <span class="st">&quot;int&quot;</span>, <span class="st">&quot;both&quot;</span>), ],</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> var, <span class="at">y =</span> value, <span class="at">color =</span> name, <span class="at">group =</span> name)</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.25</span>) <span class="sc">+</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_vline</span>(</span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">xintercept =</span> baseline),</span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>, <span class="at">linewidth =</span> <span class="fl">1.25</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_hline</span>(</span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">yintercept =</span> <span class="fl">0.05</span>),</span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">&quot;dotted&quot;</span></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme</span>(</span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a>    <span class="at">axis.text =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">18</span>),</span>
+<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a>    <span class="at">axis.title =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">22</span>),</span>
+<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a>    <span class="at">legend.title =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">22</span>),</span>
+<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a>    <span class="at">legend.text =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">18</span>)</span>
+<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">xlab</span>(<span class="st">&quot;Standard Deviation&quot;</span>) <span class="sc">+</span></span>
+<span id="cb13-25"><a href="#cb13-25" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">ylab</span>(<span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb13-26"><a href="#cb13-26" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb13-27"><a href="#cb13-27" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">scale_color_discrete</span>(<span class="at">type =</span> <span class="fu">c</span>(<span class="st">&quot;#40e0d0&quot;</span>, <span class="st">&quot;orange&quot;</span>, <span class="st">&quot;red&quot;</span>))</span>
+<span id="cb13-28"><a href="#cb13-28" tabindex="-1"></a></span>
+<span id="cb13-29"><a href="#cb13-29" tabindex="-1"></a>plot_lg</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">&quot;img/change_lg_curve_show.png&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" width="800" /></p>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
